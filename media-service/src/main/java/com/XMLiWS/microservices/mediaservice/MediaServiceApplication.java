@@ -1,10 +1,10 @@
-package com.XMLiWX.microservices.mediaservice;
+package com.XMLiWS.microservices.mediaservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-import com.XMLiWX.microservices.mediaservice.storage.FileStorageProperties;
+import com.XMLiWS.microservices.mediaservice.storage.FileStorageProperties;
 
 
 @SpringBootApplication

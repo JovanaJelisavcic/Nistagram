@@ -1,4 +1,4 @@
-package com.XMLiWX.microservices.mediaservice.controller;
+package com.XMLiWS.microservices.mediaservice.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +9,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.XMLiWS.microservices.mediaservice.storage.FileStorageService;
+import com.XMLiWS.microservices.mediaservice.storage.UploadFileResponse;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.XMLiWX.microservices.mediaservice.storage.FileStorageService;
-import com.XMLiWX.microservices.mediaservice.storage.UploadFileResponse;
 
 @RestController
 public class MediaController {

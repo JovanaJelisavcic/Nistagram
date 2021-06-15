@@ -1,4 +1,4 @@
-package com.XMLiWX.microservices.mediaservice.storage;
+package com.XMLiWS.microservices.mediaservice.storage;
 
 public class FileStorageException extends RuntimeException{
 

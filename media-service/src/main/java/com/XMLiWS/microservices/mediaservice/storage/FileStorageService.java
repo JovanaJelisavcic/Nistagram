@@ -1,4 +1,4 @@
-package com.XMLiWX.microservices.mediaservice.storage;
+package com.XMLiWS.microservices.mediaservice.storage;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
