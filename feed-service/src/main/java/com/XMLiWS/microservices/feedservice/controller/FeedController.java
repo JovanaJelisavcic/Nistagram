@@ -23,7 +23,7 @@ public class FeedController {
 		if(feed.isEmpty()) {
 			throw new RuntimeException("Unable to find data");
 		}
-		return new Feed(1000L, false, feed );
+		return new Feed(1000L, false, feed);
 	}
 
 }
