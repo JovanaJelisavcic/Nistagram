@@ -16,6 +16,8 @@ public class FeedController {
 	
 	@Autowired
 	private PostRepository repository;
+
+
 	
 	@GetMapping("/feed/unregistered")
 	public Feed getUnregisteredFeed() {
@@ -23,6 +25,9 @@ public class FeedController {
 		if(feed.isEmpty()) {
 			throw new RuntimeException("Unable to find data");
 		}
+		
+
+	
 		return new Feed(1000L, false, feed);
 	}
 
