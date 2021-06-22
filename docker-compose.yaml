@@ -1,0 +1,73 @@
+version: '3.7'
+
+services:
+  user:
+      image: jovanajelisavcic/user-service:0.0.1-SNAPSHOT
+      mem_limit: 700m
+      ports:
+        - "8200:8200"
+      networks:
+        - user-network
+      depends_on:  
+        - naming-server
+      environment:
+        EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+        SPRING.ZIPKIN.BASEURL: http://zipkin-server/9411
+  feed:
+      image: jovanajelisavcic/feed-service:0.0.1-SNAPSHOT
+      mem_limit: 700m
+      ports:
+        - "8000:8000"
+      networks:
+        - user-network
+      depends_on:  
+        - naming-server
+      environment:
+        EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+        SPRING.ZIPKIN.BASEURL: http://zipkin-server/9411      
+  
+  media:
+      image: jovanajelisavcic/media-service:0.0.1-SNAPSHOT
+      mem_limit: 700m
+      ports:
+        - "8100:8100"
+      networks:
+        - user-network
+      depends_on:  
+        - naming-server
+      environment:
+        EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+        SPRING.ZIPKIN.BASEURL: http://zipkin-server/9411      
+ 
+  api-gateway:
+      image: jovanajelisavcic/api-gateway:0.0.1-SNAPSHOT
+      mem_limit: 700m
+      ports:
+        - "8765:8765"
+      networks:
+        - user-network
+      depends_on:  
+        - naming-server
+      environment:
+        EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+        SPRING.ZIPKIN.BASEURL: http://zipkin-server/9411      
+  
+  
+  naming-server:
+      image: jovanajelisavcic/naming-server:0.0.1-SNAPSHOT
+      mem_limit: 700m
+      ports:
+        - "8761:8761"
+      networks:
+        - user-network
+
+  zipkin-server:
+      image: openzipkin/zipkin:2.23
+      mem_limit: 300m
+      ports:
+        - "9411:9411"
+      networks:
+        - user-network
+
+networks:
+  user-network:
