@@ -8,3 +8,9 @@ insert into USER (user_id, bio, birthday, email, name, phone_number, privacy, se
 insert into USER (user_id, bio, birthday, email, name, phone_number, privacy, sex, surname, username, website) values (98, 'Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam vel augue. Vestibulum rutrum rutrum neque.', '2012-01-10 14:03:29', 'fmatterface7@about.com', 'Finley', '(966) 2039363', true, false, 'Matterface', 'fmatterface7', 'pulvinar sed nisl nunc');
 insert into USER (user_id, bio, birthday, email, name, phone_number, privacy, sex, surname, username, website) values (63, 'Integer non velit. Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue.', '2009-07-12 14:50:57', 'gdybbe8@cisco.com', 'Georgy', '(892) 1424231', false, false, 'Dybbe', 'gdybbe8', 'quis turpis sed ante');
 insert into USER (user_id, bio, birthday, email, name, phone_number, privacy, sex, surname, username, website) values (100, 'Nunc purus. Phasellus in felis. Donec semper sapien a libero.', '2000-01-12 14:33:56', 'seginton9@infoseek.co.jp', 'Seline', '(519) 6833214', false, false, 'Eginton', 'seginton9', 'massa volutpat convallis');
+insert into FOLLOWERS (followers_id, from_user_fk, to_user_fk) values (98, 7, 19);
+insert into FOLLOWERS (followers_id, from_user_fk, to_user_fk) values (99, 7, 20);
+insert into FOLLOWERS (followers_id, from_user_fk, to_user_fk) values (100, 7, 63);
+insert into FOLLOWERS (followers_id, from_user_fk, to_user_fk) values (101, 63, 7);
+insert into FOLLOWERS (followers_id, from_user_fk, to_user_fk) values (102, 20, 7);
+insert into FOLLOWERS (followers_id, from_user_fk, to_user_fk) values (103, 19, 7);

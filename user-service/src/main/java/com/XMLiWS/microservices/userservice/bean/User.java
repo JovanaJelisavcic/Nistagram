@@ -1,9 +1,11 @@
 package com.XMLiWS.microservices.userservice.bean;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class User {
@@ -20,6 +22,12 @@ public class User {
 	private String website;
 	private String bio;
 	private boolean privacy;
+	
+	@OneToMany(mappedBy="to")
+	private List<Followers> followers;
+
+	@OneToMany(mappedBy="from")
+	private List<Followers> following;
 
 	public User() {
 		
@@ -39,6 +47,23 @@ public class User {
 		this.website = website;
 		this.bio = bio;
 		this.privacy = privacy;
+	}
+	
+
+    public List<Followers> getFollowers() {
+		return followers;
+	}
+
+	public void setFollowers(List<Followers> followers) {
+		this.followers = followers;
+	}
+
+	public List<Followers> getFollowing() {
+		return following;
+	}
+
+	public void setFollowing(List<Followers> following) {
+		this.following = following;
 	}
 
 	public Long getUserId() {
