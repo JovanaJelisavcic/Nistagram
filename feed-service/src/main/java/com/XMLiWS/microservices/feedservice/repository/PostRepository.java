@@ -14,6 +14,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 		@Query(value="SELECT * from POST where published < ?1 AND seeable ORDER BY published DESC LIMIT 10", nativeQuery=true)
         ArrayList<Post> findForUnregistered(Date begindate);
 		
-	/*	@Query(value="SELECT * from POST where published < ?1 AND seeable ORDER BY published DESC LIMIT 10", nativeQuery=true)*/
         ArrayList<Post> findByuserIDInAndPublishedLessThanEqual(Collection<Long> ids, Date date);
 }

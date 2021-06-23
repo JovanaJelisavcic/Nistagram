@@ -53,6 +53,7 @@ public class FeedController {
 		if(feed.isEmpty()) {
 			throw new RuntimeException("Unable to find data");
 		}
+		    feed.sort((o1,o2) -> o1.getPublished().compareTo(o2.getPublished()));
 			return new Feed(1001L, true, feed);
 		
 	}

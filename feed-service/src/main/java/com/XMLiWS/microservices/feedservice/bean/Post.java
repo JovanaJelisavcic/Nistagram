@@ -16,6 +16,7 @@ public class Post {
 	private Date published;
 	private String url;
 	private boolean seeable;
+	private String type;
 	
 	public Post() {
 		
@@ -78,6 +79,16 @@ public class Post {
 
 	public void setSeeable(boolean seeable) {
 		this.seeable = seeable;
+	}
+
+
+	public String getType() {
+		return type;
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

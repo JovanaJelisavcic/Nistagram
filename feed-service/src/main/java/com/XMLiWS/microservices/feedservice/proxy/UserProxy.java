@@ -13,4 +13,6 @@ public interface UserProxy {
 	@GetMapping("/user/following/{id}")
 	public List<Long> usersFollowingIds(@PathVariable long id);
 
+	@GetMapping("/user/{id}/seeable")
+	public boolean getSeeable(@PathVariable long id);
 }

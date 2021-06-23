@@ -86,4 +86,11 @@ public class UserController {
 			return ids;
 		}
 		
+		@GetMapping("/user/{id}/seeable")
+		public boolean getSeeable(@PathVariable long id) {
+
+			Optional<User> userOptional = userRepo.findById(id);
+			return userOptional.get().isPrivacy();
+		}
+		
 }
