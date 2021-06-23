@@ -16,19 +16,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.XMLiWS.microservices.userservice.bean.Followers;
 import com.XMLiWS.microservices.userservice.bean.User;
+import com.XMLiWS.microservices.userservice.repository.FollowRepository;
 import com.XMLiWS.microservices.userservice.repository.UserRepository;
 
 @RestController
 public class UserController {
 
 		Logger logger = LoggerFactory.getLogger(UserController.class);
+		
 		@Autowired
 		UserRepository userRepo;
+		@Autowired
+		FollowRepository followRepo;
 		
 		@GetMapping("/user/{id}")
 		public User getUser(@PathVariable String id) {
@@ -92,6 +97,20 @@ public class UserController {
 			Optional<User> userOptional = userRepo.findById(id);
 			return userOptional.get().isPrivacy();
 		}
+		
+		
+		@PostMapping("/followers/{fromId}/{toId}")
+		public ResponseEntity<Object> addFollowing(@PathVariable long fromId,@PathVariable long toId) {
+			
+			Followers savedFollow = followRepo.save(new Followers(userRepo.findByUserId(fromId), userRepo.findByUserId(toId)));
+
+			URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+					.buildAndExpand(savedFollow.getFollowersId()).toUri();
+
+			return ResponseEntity.created(location).build();
+
+		}
+		
 		
 		
 }
