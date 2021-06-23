@@ -16,7 +16,7 @@ public class Post {
 	private Date published;
 	private String url;
 	private boolean seeable;
-	private String type;
+	private String postType;
 	
 	public Post() {
 		
@@ -82,13 +82,13 @@ public class Post {
 	}
 
 
-	public String getType() {
-		return type;
+	public String getPostType() {
+		return postType;
 	}
 
 
-	public void setType(String type) {
-		this.type = type;
+	public void setPostType(String type) {
+		this.postType = type;
 	}
 
 }

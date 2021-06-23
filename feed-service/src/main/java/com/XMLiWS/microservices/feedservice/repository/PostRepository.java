@@ -15,4 +15,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         ArrayList<Post> findForUnregistered(Date begindate);
 		
         ArrayList<Post> findByuserIDInAndPublishedLessThanEqual(Collection<Long> ids, Date date);
+        
+        ArrayList<Post> findByuserID(Long id);
 }
