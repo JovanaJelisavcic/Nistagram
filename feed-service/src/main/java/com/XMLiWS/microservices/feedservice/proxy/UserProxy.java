@@ -3,6 +3,7 @@ package com.XMLiWS.microservices.feedservice.proxy;
 import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -11,9 +12,9 @@ public interface UserProxy {
 
 	
 	@GetMapping("/user/following/{id}")
-	public List<Long> usersFollowingIds(@PathVariable long id);
+	public ResponseEntity<List<Long>> usersFollowingIds(@PathVariable long id);
 
 	@GetMapping("/user/{id}/privacy")
-	public boolean getPrivacy(@PathVariable long id);
+	public ResponseEntity<Boolean> getPrivacy(@PathVariable long id);
 	
 }

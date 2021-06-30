@@ -3,12 +3,15 @@ package com.XMLiWS.microservices.feedservice.bean;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class Post {
 	
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long postID;
 	private Long userID;
 	private int numOfLikes;
@@ -23,9 +26,8 @@ public class Post {
 	}
 	
 	
-	public Post(Long postID, Long userID, int numOfLikes, int numOfComments, Date published, String url, boolean seeable) {
+	public Post(Long userID, int numOfLikes, int numOfComments, Date published, String url, boolean seeable) {
 		super();
-		this.postID = postID;
 		this.userID = userID;
 		this.numOfLikes = numOfLikes;
 		this.numOfComments = numOfComments;

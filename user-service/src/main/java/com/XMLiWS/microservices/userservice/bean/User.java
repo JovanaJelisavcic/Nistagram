@@ -4,13 +4,19 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
+@JsonIgnoreProperties(value = { "following", "followers" })
 public class User {
 	
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long userId;
 	private String username;
 	private String name;
@@ -33,10 +39,9 @@ public class User {
 		
 	}
 
-	public User(Long userId, String username, String name, String surname, String email, String phoneNumber,
+	public User(String username, String name, String surname, String email, String phoneNumber,
 			boolean sex, Date birthday, String website, String bio, boolean privacy) {
 		super();
-		this.userId = userId;
 		this.username = username;
 		this.name = name;
 		this.surname = surname;

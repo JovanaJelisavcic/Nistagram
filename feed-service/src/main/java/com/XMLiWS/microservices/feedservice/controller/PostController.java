@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +35,7 @@ public class PostController {
 		post.setNumOfComments(0);
 		post.setNumOfLikes(0);
 		post.setPublished(new Date());
-		post.setSeeable(proxy.getPrivacy(post.getUserID()));
+		post.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
 		Post savedPost = repository.save(post);
 		
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -44,33 +45,33 @@ public class PostController {
 	}
 	
 	@GetMapping("/post/self/{id}")
-	public List<Post> profilePosts(@PathVariable long id) {
+	public ResponseEntity<List<Post>> profilePosts(@PathVariable long id) {
 		List<Post> posts = repository.findByuserID(id);
 		
 		if(posts.isEmpty()) {
-			throw new RuntimeException("No posts yet");
+			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
 		}
-		return posts;
+		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 	}
 	
 	@GetMapping("/post/user/{id}/{myid}")
-	public List<Post> usersPosts(@PathVariable long id, @PathVariable long myid) {
+	public ResponseEntity<List<Post>> usersPosts(@PathVariable long id, @PathVariable long myid) {
 		List<Post> posts= null;
-		if(proxy.getPrivacy(id)) {
-			List<Long> ids = proxy.usersFollowingIds(id);
+		if(proxy.getPrivacy(id).getBody()) {
+			List<Long> ids = proxy.usersFollowingIds(id).getBody();
 			if(ids.contains(myid)) {
 				posts = repository.findByuserID(id);
-				return posts;
+				return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 			}
 		}else {
 		    posts = repository.findByuserID(id);
-			return posts;
+			return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 		}
 		if(posts.isEmpty()) {
-			throw new RuntimeException("No posts yet");
+			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
 		}
-		return posts;
+		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 		
 	}
-
+	
 }

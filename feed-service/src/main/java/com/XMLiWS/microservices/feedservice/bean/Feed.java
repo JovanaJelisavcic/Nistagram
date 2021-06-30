@@ -2,9 +2,11 @@ package com.XMLiWS.microservices.feedservice.bean;
 
 import java.util.ArrayList;
 
+
+
 public class Feed {
-	private Long id;
-	private boolean feedType; //1-registered 0-unregistered
+
+	private boolean feedType;
 	private ArrayList<Post> posts;
 	
 	public Feed() {
@@ -12,19 +14,12 @@ public class Feed {
 	}
 	
 	
-	public Feed(Long id, boolean feedType, ArrayList<Post> posts) {
+	public Feed(boolean feedType, ArrayList<Post> posts) {
 		super();
-		this.id = id;
 		this.feedType = feedType;
 		this.posts = posts;
 	}
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
 	public boolean isFeedType() {
 		return feedType;
 	}

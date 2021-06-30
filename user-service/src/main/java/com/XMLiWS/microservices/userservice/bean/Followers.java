@@ -13,6 +13,7 @@ public class Followers {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private long followersId;
+    private boolean accepted;
 
     @ManyToOne
     @JoinColumn(name="from_user_fk")
@@ -51,6 +52,14 @@ public class Followers {
 
 	public void setTo(User to) {
 		this.to = to;
+	}
+
+	public boolean isAccepted() {
+		return accepted;
+	}
+
+	public void setAccepted(boolean accepted) {
+		this.accepted = accepted;
 	}
     
     
