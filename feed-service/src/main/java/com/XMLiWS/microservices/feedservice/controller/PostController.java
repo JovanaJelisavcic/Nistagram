@@ -1,6 +1,7 @@
 package com.XMLiWS.microservices.feedservice.controller;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class PostController {
 	
 	@GetMapping("/post/user/{id}/{myid}")
 	public ResponseEntity<List<Post>> usersPosts(@PathVariable long id, @PathVariable long myid) {
-		List<Post> posts= null;
+		List<Post> posts= new ArrayList<>();
 		if(proxy.getPrivacy(id).getBody()) {
 			List<Long> ids = proxy.usersFollowingIds(id).getBody();
 			if(ids.contains(myid)) {
