@@ -1,11 +1,19 @@
 package com.XMLiWS.microservices.feedservice.bean;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PostLoad;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 public class Post {
@@ -20,13 +28,23 @@ public class Post {
 	private String url;
 	private boolean seeable;
 	private String postType;
+	private String location;
+	private String description;
+	@JsonInclude()
+	@Transient
+	Set<String> hashtags = new HashSet<>();
+	@JsonInclude()
+	@Transient
+	Set<String> profiletags = new HashSet<>();
+
 	
 	public Post() {
-		
 	}
 	
 	
-	public Post(Long userID, int numOfLikes, int numOfComments, Date published, String url, boolean seeable) {
+
+
+	public Post(Long userID, int numOfLikes, int numOfComments, Date published, String url, boolean seeable, String location, String description) {
 		super();
 		this.userID = userID;
 		this.numOfLikes = numOfLikes;
@@ -34,8 +52,11 @@ public class Post {
 		this.published = published;
 		this.url = url;
 		this.seeable= seeable;
+		this.location = location;
+		this.description=description;
+
 	}
-	
+
 	public Long getPostID() {
 		return postID;
 	}
@@ -92,5 +113,65 @@ public class Post {
 	public void setPostType(String type) {
 		this.postType = type;
 	}
+
+
+	public String getLocation() {
+		return location;
+	}
+
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+
+	public String getDescription() {
+		return description;
+	}
+
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public Set<String> getHashtags() {
+		return hashtags;
+	}
+
+
+	public void setHashtags(Set<String> hashtags) {
+		this.hashtags = hashtags;
+	}
+
+
+	public Set<String> getProfiletags() {
+		return profiletags;
+	}
+
+
+	public void setProfiletags(Set<String> profiletags) {
+		this.profiletags = profiletags;
+	}
+
+	
+	
+	@PostLoad
+	private void populateSets() {
+		String des = StringUtils.appendIfMissing(description, " ");
+		 String[] hashs = StringUtils.substringsBetween(des, "#", " ");
+		 if(hashs!=null) {
+	        for (String s : hashs) {
+	            hashtags.add(s);
+	        }
+		 }
+	        
+	        String[] profs = StringUtils.substringsBetween(des, "@", " ");
+	        if(profs!=null) {
+	        for (String s : profs) {
+	            profiletags.add(s);
+	        }
+	        }
+		
+	}
+	
 
 }

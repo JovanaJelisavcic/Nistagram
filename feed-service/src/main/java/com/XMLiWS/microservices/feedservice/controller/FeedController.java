@@ -36,7 +36,7 @@ public class FeedController {
 			 return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
 		}
 		
-
+		logger.info(feed.get(0).getHashtags().toString());
 	
 		return new ResponseEntity<List<Post>>(feed, HttpStatus.OK);
 	}
