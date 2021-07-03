@@ -19,3 +19,15 @@ insert into POST (postid, num_of_comments, num_of_likes, published, url, userid,
 insert into POST (postid, num_of_comments, num_of_likes, published, url, userid, seeable, post_type, location, description) values (6170, 391, 45, TO_DATE('2021/06/13 14:05:88', 'YYYY-MM-DD hh:mm:ss'), 'http://dummyimage.com/100x100.png/5fa2dd/ffffff', 73, false, 'story', 'Zlatibor','bird songs with @mkellick4 #dream #nature #birds ');
 insert into POST (postid, num_of_comments, num_of_likes, published, url, userid, seeable, post_type, location, description) values (5480, 153, 392, TO_DATE('2021/06/13 14:05:88', 'YYYY-MM-DD hh:mm:ss'), 'http://dummyimage.com/100x100.png/5fa2dd/ffffff', 7, true, 'story', 'Tara','fresh air #nature #free #love');
 
+insert into LIKED(postid, liked) values (3784, 19);
+insert into LIKED(postid, liked) values (3784, 63);
+insert into LIKED(postid, liked) values (3784, 73);
+insert into LIKED(postid, liked) values (6204, 7);
+insert into LIKED(postid, liked) values (778, 7);
+insert into LIKED(postid, liked) values (778, 64);
+insert into LIKED(postid, liked) values (778, 73);
+
+insert into DISLIKED(postid, disliked) values (3116, 73);
+insert into DISLIKED(postid, disliked) values (4260, 73);
+insert into DISLIKED(postid, disliked) values (2632, 73);
+

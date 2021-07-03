@@ -24,4 +24,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 		List<Post> findAllByLocationLikeIgnoreCaseAndSeeable(String string, boolean b);
 
 		List<Post> findAllBySeeable(boolean b);
+		
+		@Query(value="select * from post p join liked l where p.postid=l.postid and l.liked=?1", nativeQuery=true)
+		List<Post> findLikedPosts(Long userID);
+
+		@Query(value="select * from post p join disliked d where p.postid=d.postid and d.disliked=?1", nativeQuery=true)
+		List<Post> findDislikedPosts(long id);
 }

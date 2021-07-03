@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import com.XMLiWS.microservices.feedservice.repository.PostRepository;
 
 @RestController
 public class PostController {
+	
+	Logger logger = LoggerFactory.getLogger(PostController.class);
 
 	@Autowired
 	private PostRepository repository;
@@ -68,6 +72,29 @@ public class PostController {
 		    posts = repository.findByuserID(id);
 			return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 		}
+		if(posts.isEmpty()) {
+			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
+		
+	}
+	
+	
+	@GetMapping("/post/liked/{id}")
+	public ResponseEntity<List<Post>> getLiked(@PathVariable long id) {
+		List<Post> posts= new ArrayList<>();
+		posts =repository.findLikedPosts(id);
+		if(posts.isEmpty()) {
+			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
+		
+	}
+	
+	@GetMapping("/post/disliked/{id}")
+	public ResponseEntity<List<Post>> getDisLiked(@PathVariable long id) {
+		List<Post> posts= new ArrayList<>();
+		posts =repository.findDislikedPosts(id);
 		if(posts.isEmpty()) {
 			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
 		}

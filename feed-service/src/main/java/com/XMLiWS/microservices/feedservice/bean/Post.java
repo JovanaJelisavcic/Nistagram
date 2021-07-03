@@ -2,12 +2,17 @@ package com.XMLiWS.microservices.feedservice.bean;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.PostLoad;
 import javax.persistence.Transient;
 
@@ -36,6 +41,19 @@ public class Post {
 	@JsonInclude()
 	@Transient
 	Set<String> profiletags = new HashSet<>();
+	@ElementCollection
+	@CollectionTable(
+				name="liked",
+				joinColumns=@JoinColumn(name="postid"))
+	@Column(name="liked")
+	private List<Long> liked;
+
+	@ElementCollection
+	@CollectionTable(
+				name="disliked",
+				joinColumns=@JoinColumn(name="postid"))
+	@Column(name="disliked")
+	private List<Long> disliked;
 
 	
 	public Post() {
@@ -152,7 +170,33 @@ public class Post {
 		this.profiletags = profiletags;
 	}
 
-	
+	public List<Long> getLiked() {
+		return liked;
+	}
+
+
+
+
+	public void setLiked(List<Long> liked) {
+		this.liked = liked;
+	}
+
+
+
+
+	public List<Long> getDisliked() {
+		return disliked;
+	}
+
+
+
+
+	public void setDisliked(List<Long> disliked) {
+		this.disliked = disliked;
+	}
+
+
+
 	
 	@PostLoad
 	private void populateSets() {
