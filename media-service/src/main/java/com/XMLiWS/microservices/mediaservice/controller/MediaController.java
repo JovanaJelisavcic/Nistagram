@@ -30,7 +30,7 @@ public class MediaController {
 	        String fileName = fileStorageService.storeFile(file);
 
 	        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-	                .path("/downloadFile/")
+	                .path("/displayFile/")
 	                .path(fileName)
 	                .toUriString();
 

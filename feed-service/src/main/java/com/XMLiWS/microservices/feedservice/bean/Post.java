@@ -1,6 +1,6 @@
 package com.XMLiWS.microservices.feedservice.bean;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,13 +27,21 @@ public class Post {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long postID;
 	private Long userID;
+	@Column(nullable = true)
 	private int numOfLikes;
+	@Column(nullable = true)
 	private int numOfComments;
-	private Date published;
-	private String url;
-	private boolean seeable;
-	private String postType;
+	private LocalDateTime published;
 	private String location;
+	private boolean seeable;
+	private String postType; 
+	@ElementCollection
+	@CollectionTable(
+				name="url",
+				joinColumns=@JoinColumn(name="postid"))
+	@Column(name="url")
+	private List<String> url;
+	@Column(nullable = true)
 	private String description;
 	@JsonInclude()
 	@Transient
@@ -62,7 +70,7 @@ public class Post {
 	
 
 
-	public Post(Long userID, int numOfLikes, int numOfComments, Date published, String url, boolean seeable, String location, String description) {
+	public Post(Long userID, int numOfLikes, int numOfComments, LocalDateTime published, List<String> url, boolean seeable, String location, String description) {
 		super();
 		this.userID = userID;
 		this.numOfLikes = numOfLikes;
@@ -99,16 +107,16 @@ public class Post {
 	public void setNumOfComments(int numOfComments) {
 		this.numOfComments = numOfComments;
 	}
-	public Date getPublished() {
+	public LocalDateTime getPublished() {
 		return published;
 	}
-	public void setPublished(Date published) {
+	public void setPublished(LocalDateTime published) {
 		this.published = published;
 	}
-	public String getUrl() {
+	public List<String> getUrl() {
 		return url;
 	}
-	public void setUrl(String url) {
+	public void setUrl(List<String> url) {
 		this.url = url;
 	}
 

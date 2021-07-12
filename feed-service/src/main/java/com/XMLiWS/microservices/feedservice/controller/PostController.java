@@ -1,9 +1,10 @@
 package com.XMLiWS.microservices.feedservice.controller;
 
-import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.XMLiWS.microservices.feedservice.bean.Feed;
 import com.XMLiWS.microservices.feedservice.bean.Post;
 import com.XMLiWS.microservices.feedservice.proxy.UserProxy;
 import com.XMLiWS.microservices.feedservice.repository.PostRepository;
@@ -36,47 +37,79 @@ public class PostController {
 	
 	@PostMapping("/post/post")
 	public ResponseEntity<Object> postPost(@RequestBody Post post) {
+		if(post.getUrl().size()==1) {
 		post.setPostType("post");
+		}else {
+			post.setPostType("album");
+		}
 		post.setNumOfComments(0);
 		post.setNumOfLikes(0);
-		post.setPublished(new Date());
+		post.setPublished( LocalDateTime.now());
 		post.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
-		Post savedPost = repository.save(post);
-		
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-				.buildAndExpand(savedPost.getPostID()).toUri();
-
-		return ResponseEntity.created(location).build();
+		repository.save(post);
+		return ResponseEntity.created(null).build();
 	}
 	
-	@GetMapping("/post/self/{id}")
-	public ResponseEntity<List<Post>> profilePosts(@PathVariable long id) {
-		List<Post> posts = repository.findByuserID(id);
-		
-		if(posts.isEmpty()) {
-			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
+	@PostMapping("/post/story")
+	public ResponseEntity<Object> postStory(@RequestBody Post post) {
+		if(post.getUrl().size()==1) {
+		post.setPostType("story");
+		post.setDescription("");
+		post.setLocation("");
+		post.setNumOfComments(0);
+		post.setNumOfLikes(0);
+		post.setPublished( LocalDateTime.now());
+		post.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
+		repository.save(post);
+		} else {
+			for(String url : post.getUrl()) {
+				Post story = new Post();
+				post.setDescription("");
+				post.setLocation("");
+				story.setUserID(post.getUserID());
+				story.setPostType("story");
+				story.setNumOfComments(0);
+				story.setNumOfLikes(0);
+				story.setPublished( LocalDateTime.now());
+				story.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
+				List<String> thisUrl = new ArrayList<>();
+				thisUrl.add(url);
+				story.setUrl(thisUrl);
+				repository.save(story);
+			}
 		}
-		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
+		return ResponseEntity.created(null).build();
 	}
 	
-	@GetMapping("/post/user/{id}/{myid}")
-	public ResponseEntity<List<Post>> usersPosts(@PathVariable long id, @PathVariable long myid) {
-		List<Post> posts= new ArrayList<>();
+	@GetMapping("/post/selfProfile/{id}")
+	public ResponseEntity<Feed> profilePosts(@PathVariable long id) {
+		List<Post> postsAndStories = repository.findByuserID(id);
+		 Map<Boolean, List<Post>> groups = 
+		 postsAndStories.stream().collect(Collectors.partitioningBy( s -> s.getPostType().equalsIgnoreCase("story")));
+
+		 List<Post> posts = groups.get(false);
+		 List<Post> stories = groups.get(true);
+		if(posts.isEmpty() && stories.isEmpty()) {
+			return new ResponseEntity<Feed>(HttpStatus.NOT_FOUND);
+		}
+		Feed feed =  new Feed();
+		feed.setPosts(posts);
+		feed.setStories(stories);
+		return new ResponseEntity<Feed>(feed, HttpStatus.OK);
+	}
+	
+	@GetMapping("/post/userProfile/{id}/{myid}")
+	public ResponseEntity<Feed> usersPosts(@PathVariable long id, @PathVariable long myid) {
 		if(proxy.getPrivacy(id).getBody()) {
 			List<Long> ids = proxy.usersFollowingIds(id).getBody();
 			if(ids.contains(myid)) {
-				posts = repository.findByuserID(id);
-				return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
+				return profilePosts(id);
 			}
-		}else {
-		    posts = repository.findByuserID(id);
-			return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
+		}else {	
+			return profilePosts(id);
 		}
-		if(posts.isEmpty()) {
-			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
-		
+		return null;
+
 	}
 	
 	
