@@ -1,15 +1,24 @@
 package com.XMLiWS.microservices.authservice.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import javax.ws.rs.core.Response;
+
 import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,15 +63,13 @@ public class AuthController {
     @PostMapping(path = "/create")
     public ResponseEntity<?> createUser(@RequestBody  UserDTO userDTO) {
 
-        Keycloak keycloak = KeycloakBuilder.builder().serverUrl("http://localhost:8080/auth/realms/master/protocol/openid-connect/token")
+        Keycloak keycloak = KeycloakBuilder.builder().serverUrl("http://localhost:8080/auth")
                 .grantType(OAuth2Constants.PASSWORD).realm("master").clientId("admin-cli")
                 .username("jovanaje").password("vocniBUM95")
-                .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10).build()).build();
-
-        keycloak.tokenManager().getAccessToken();
+                .build();
 
 
-       /* UserRepresentation user = new UserRepresentation();
+        UserRepresentation user = new UserRepresentation();
         user.setEnabled(true);
         user.setUsername(userDTO.getUsername());
 
@@ -95,7 +102,7 @@ public class AuthController {
 
             // Assign realm role student to user
             userResource.roles().realmLevel().add(Arrays.asList(realmRoleUser));
-        }*/
+        }
         return ResponseEntity.ok(userDTO);
     }
 	
