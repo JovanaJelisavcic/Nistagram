@@ -1,0 +1,10 @@
+insert into USERDTO (username, password) values ('mrubinov0', 'mypassword');
+insert into USERDTO (username, password) values ('aselly1', 'mypassword');
+insert into USERDTO (username, password) values ('kmiroy2', 'mypassword');
+insert into USERDTO (username, password) values ('fcremins3', 'mypassword');
+insert into USERDTO (username, password) values ('mkellick4', 'mypassword');
+insert into USERDTO (username, password) values ('shundell5', 'mypassword');
+insert into USERDTO (username, password) values ('vwitherup6', 'mypassword');
+insert into USERDTO (username, password) values ('fmatterface7', 'mypassword');
+insert into USERDTO (username, password) values ('gdybbe8', 'mypassword');
+insert into USERDTO (username, password) values ('seginton9', 'mypassword');
