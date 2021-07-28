@@ -2,7 +2,6 @@ package com.XMLiWS.microservices.userservice.controller;
 
 
 
-import java.net.URI;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -16,9 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.XMLiWS.microservices.userservice.bean.User;
+import com.XMLiWS.microservices.userservice.proxy.AuthProxy;
 import com.XMLiWS.microservices.userservice.repository.FollowRepository;
 import com.XMLiWS.microservices.userservice.repository.UserRepository;
 
@@ -31,6 +30,8 @@ public class UserController {
 		UserRepository userRepo;
 		@Autowired
 		FollowRepository followRepo;
+		@Autowired
+		private AuthProxy authProxy;
 		
 		@GetMapping("/user/{id}")
 		public ResponseEntity<User> getUser(@PathVariable String id) {
@@ -43,12 +44,16 @@ public class UserController {
 		
 		@PostMapping("/user")
 		public ResponseEntity<Object> createUser(@RequestBody User user) {
-			User savedUser = userRepo.save(user);
+			
+			String token = authProxy.create(user);
+			if(!token.isBlank()) {
+			userRepo.save(user);
 
-			URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-					.buildAndExpand(savedUser.getUserId()).toUri();
+			//URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+				//	.buildAndExpand(savedUser.getUserId()).toUri();
 
-			return ResponseEntity.created(location).build();
+			return ResponseEntity.ok(token);
+			}else return ResponseEntity.unprocessableEntity().build();
 
 		}
 		

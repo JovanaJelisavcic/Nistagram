@@ -8,8 +8,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @JsonIgnoreProperties(value = { "following", "followers" })
@@ -28,7 +30,9 @@ public class User {
 	private String website;
 	private String bio;
 	private boolean privacy;
-	
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Transient
+	private String password;
 	@OneToMany(mappedBy="to")
 	private List<Followers> followers;
 
@@ -40,7 +44,7 @@ public class User {
 	}
 
 	public User(String username, String name, String surname, String email, String phoneNumber,
-			boolean sex, Date birthday, String website, String bio, boolean privacy) {
+			boolean sex, Date birthday, String website, String bio, boolean privacy, String password) {
 		super();
 		this.username = username;
 		this.name = name;
@@ -52,6 +56,7 @@ public class User {
 		this.website = website;
 		this.bio = bio;
 		this.privacy = privacy;
+		this.password= password;
 	}
 	
 
@@ -157,6 +162,14 @@ public class User {
 
 	public void setPrivacy(boolean privacy) {
 		this.privacy = privacy;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	
