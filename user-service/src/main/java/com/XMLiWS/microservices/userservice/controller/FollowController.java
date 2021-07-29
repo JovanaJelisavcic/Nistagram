@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,6 +22,9 @@ import com.XMLiWS.microservices.userservice.bean.Followers;
 import com.XMLiWS.microservices.userservice.bean.User;
 import com.XMLiWS.microservices.userservice.repository.FollowRepository;
 import com.XMLiWS.microservices.userservice.repository.UserRepository;
+import com.XMLiWS.microservices.userservice.util.TokenUtil;
+import com.XMLiWS.microservices.userservice.view.View;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 public class FollowController {
@@ -31,8 +35,10 @@ public class FollowController {
 	UserRepository userRepo;
 	@Autowired
 	FollowRepository followRepo;
+	private TokenUtil tokenUtil = new TokenUtil();
 
-	@GetMapping("/user/following/{id}")
+	@GetMapping("public/user/following/{id}")
+	@JsonView(View.Detailed.class)
 	public ResponseEntity<List<Long>> usersFollowingIds(@PathVariable long id) {
 
 		Optional<User> userOptional = userRepo.findById(id);
@@ -53,13 +59,16 @@ public class FollowController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	@PostMapping("/followPublic/{fromId}/{toId}")
-	public ResponseEntity<Object> addFollowingPublic(@PathVariable long fromId, @PathVariable long toId) {
-
-		if (!userRepo.findById(fromId).isPresent() || !userRepo.findById(toId).isPresent()) {
+	@PostMapping("/followPublic/{toId}")
+	@JsonView(View.Detailed.class)
+	public ResponseEntity<Object> addFollowingPublic(@RequestHeader("Authorization") String token, @PathVariable long toId) {
+		String username = tokenUtil.extractIdentity(token);
+		Optional<User> fromUser = userRepo.findByUsername(username);
+		Optional<User> toUser = userRepo.findById(toId);
+		if (!fromUser.isPresent() || !toUser.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		} else if (followRepo.findFollowings(fromId, toId) == null) {
-			Followers follow = new Followers(userRepo.findByUserId(fromId), userRepo.findByUserId(toId));
+		} else if (followRepo.findFollowings(fromUser.get().getUserId(), toId) == null && !toUser.get().isPrivacy()) {
+			Followers follow = new Followers(fromUser.get(), userRepo.findByUserId(toId));
 			follow.setAccepted(true);
 			followRepo.save(follow);
 
@@ -72,14 +81,16 @@ public class FollowController {
 
 	}
 
-	@PutMapping("/followRequest/{fromId}/{toId}")
-	public ResponseEntity<Object> addFollowingRequest(@PathVariable long fromId, @PathVariable long toId) {
-
-		if (!userRepo.findById(fromId).isPresent() || !userRepo.findById(toId).isPresent()) {
+	@PostMapping("/followRequest/{toId}")
+	@JsonView(View.Detailed.class)
+	public ResponseEntity<Object> addFollowingRequest(@RequestHeader("Authorization") String token, @PathVariable long toId) {
+		String username = tokenUtil.extractIdentity(token);
+		Optional<User> fromUser = userRepo.findByUsername(username);
+		Optional<User> toUser = userRepo.findById(toId);
+		if (!fromUser.isPresent() || !toUser.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		else if (followRepo.findFollowings(fromId, toId) == null) {
-			Followers follow = new Followers(userRepo.findByUserId(fromId), userRepo.findByUserId(toId));
+		}else if (followRepo.findFollowings(fromUser.get().getUserId(), toId) == null && toUser.get().isPrivacy() ) {
+			Followers follow = new Followers(fromUser.get(), toUser.get());
 			follow.setAccepted(false);
 			followRepo.save(follow);
 
@@ -92,17 +103,24 @@ public class FollowController {
 
 	}
 
-	@PutMapping("/followAccept/{fromId}/{toId}")
-	public ResponseEntity<Object> addFollowingAccept(@PathVariable long fromId, @PathVariable long toId) {
-		if (followRepo.findFollowings(fromId, toId) != null) {
-			Followers follow = followRepo.findFollowings(fromId, toId);
-			logger.info(follow + "ovo je followww");
+	@PutMapping("/followAccept/{fromId}")
+	@JsonView(View.Detailed.class)
+	public ResponseEntity<Object> addFollowingAccept(@RequestHeader("Authorization") String token, @PathVariable long fromId) {
+		
+		String username = tokenUtil.extractIdentity(token);
+		Optional<User> toUser = userRepo.findByUsername(username);
+		Optional<User> fromUser = userRepo.findById(fromId);
+		if (!fromUser.isPresent() || !toUser.isPresent()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}else {		
+		Followers follow = followRepo.findFollowings(fromId, toUser.get().getUserId());
+		if (follow!=null) {
 			follow.setAccepted(true);
 			followRepo.save(follow);
-
 			return ResponseEntity.ok().build();
-		} else
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+			
 	}
 
 }

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.XMLiWS.microservices.userservice.bean.User;
 import com.XMLiWS.microservices.userservice.repository.UserRepository;
+import com.XMLiWS.microservices.userservice.view.View;
+import com.fasterxml.jackson.annotation.JsonView;
 
 
 
@@ -26,6 +28,7 @@ public class SearchController {
 	private UserRepository repository;
 	
 	@GetMapping("/user/searchHash/{hash}")
+	@JsonView(View.Simple.class)
 	public ResponseEntity<List<User>> searchHashAll(@PathVariable String hash) {
 		 StringBuilder sb = new StringBuilder(hash.concat("%"));
 		 sb.insert(0,"%");
@@ -37,7 +40,8 @@ public class SearchController {
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
 	}
 	
-	@GetMapping("/user/searchHashPublic/{hash}")
+	@GetMapping("/public/user/searchHash/{hash}")
+	@JsonView(View.Simple.class)
 	public ResponseEntity<List<User>> searchHashPublic(@PathVariable String hash) {
 		 StringBuilder sb = new StringBuilder(hash.concat("%"));
 		 sb.insert(0,"%");
@@ -51,6 +55,7 @@ public class SearchController {
 	
 	
 	@GetMapping("/user/searchProfiles/{name}")
+	@JsonView(View.Simple.class)
 	public ResponseEntity<List<User>> searchProfiles(@PathVariable String name) {
 		List<User> users = null;
 		if(name.contains(" ")) {
@@ -74,7 +79,8 @@ public class SearchController {
 	}
 	
 	
-	@GetMapping("/user/searchProfilesPublic/{name}")
+	@GetMapping("/public/user/searchProfiles/{name}")
+	@JsonView(View.Simple.class)
 	public ResponseEntity<List<User>> searchProfilesPublic(@PathVariable String name) {
 		logger.info(name);
 		List<User> users = null;

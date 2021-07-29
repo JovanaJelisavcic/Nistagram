@@ -16,5 +16,5 @@ public interface AuthProxy {
 	public String create(@RequestBody User userDTO);
 	@GetMapping("/")
 	public String user(@RequestHeader("Authorization") String token);
-
+	
 }

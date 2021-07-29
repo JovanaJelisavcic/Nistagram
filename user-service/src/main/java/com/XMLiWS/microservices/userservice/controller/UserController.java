@@ -14,12 +14,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.XMLiWS.microservices.userservice.bean.Followers;
 import com.XMLiWS.microservices.userservice.bean.User;
 import com.XMLiWS.microservices.userservice.proxy.AuthProxy;
 import com.XMLiWS.microservices.userservice.repository.FollowRepository;
 import com.XMLiWS.microservices.userservice.repository.UserRepository;
+import com.XMLiWS.microservices.userservice.util.TokenUtil;
+import com.XMLiWS.microservices.userservice.view.View;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 public class UserController {
@@ -32,18 +39,58 @@ public class UserController {
 		FollowRepository followRepo;
 		@Autowired
 		private AuthProxy authProxy;
+		private TokenUtil tokenUtil = new TokenUtil();
+		 ObjectMapper mapper = new ObjectMapper();
 		
-		@GetMapping("/user/{id}")
-		public ResponseEntity<User> getUser(@PathVariable String id) {
+		@GetMapping("/public/user/{id}")
+		public ResponseEntity<String> publicGetUser(@PathVariable String id) throws JsonProcessingException {
 			User user = userRepo.findByUserId(Long.parseLong(id));
 			if(user == null) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-			return new ResponseEntity<User>(user, HttpStatus.OK);
+			}else if(user.isPrivacy()) {
+				return new ResponseEntity<String>(mapper.writerWithView(View.Simple.class).writeValueAsString(user),HttpStatus.OK);
+			}else 
+			return new ResponseEntity<String>(mapper.writerWithView(View.Detailed.class).writeValueAsString(user), HttpStatus.OK);
 		}
 		
+
+		@GetMapping("/user/{id}")
+		public ResponseEntity<String> getUser(@RequestHeader("Authorization") String token, @PathVariable String id) throws JsonProcessingException {
+			String username = tokenUtil.extractIdentity(token);
+			User user = userRepo.findByUserId(Long.parseLong(id));
+			if(user == null) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}else if(!user.isPrivacy()) {
+				return new ResponseEntity<String>(mapper.writerWithView(View.Detailed.class).writeValueAsString(user), HttpStatus.OK);
+				
+			}else {
+				Followers follow = followRepo.findFollowings(userRepo.findByUsername(username).get().getUserId(), Long.parseLong(id));
+				if(follow!=null && follow.isAccepted()) {
+					return new ResponseEntity<String>(mapper.writerWithView(View.Detailed.class).writeValueAsString(user), HttpStatus.OK);
+				}else  return new ResponseEntity<String>(mapper.writerWithView(View.Simple.class).writeValueAsString(user), HttpStatus.OK);
+				
+			}		
+				
+			}
+			
+		@GetMapping("/user/me")
+		@JsonView(View.Detailed.class)
+		public User showMe(@RequestHeader("Authorization") String token){
+			String username = tokenUtil.extractIdentity(token);
+			Optional<User> meUser = userRepo.findByUsername(username);
+			return meUser.get();
+		}
+		
+		
 		@PostMapping("/public/user")
+		@JsonView(View.Detailed.class)
 		public ResponseEntity<Object> createUser(@RequestBody User user) {
+			if(user.getUserId()!=null) {
+				if(userRepo.findByUserId(user.getUserId())!=null)
+					return ResponseEntity.status(HttpStatus.CONFLICT).build();
+				
+			}
+			
 			
 			String token = authProxy.create(user);
 			if(!token.isBlank()) {
@@ -58,20 +105,24 @@ public class UserController {
 		}
 		
 		@PutMapping("/user")
-		public ResponseEntity<Object> updateUser(@RequestBody User user) {
-
-			Optional<User> userOptional = userRepo.findById(user.getUserId());
+		@JsonView(View.Detailed.class)
+		public ResponseEntity<Object> updateUser(@RequestHeader("Authorization") String token,@RequestBody User user) {
+			
+			Optional<User> userOptional = userRepo.findByUsername(user.getUsername());
 			if (!userOptional.isPresent()) {
 				return ResponseEntity.notFound().build();
-			}
+			}else if(!tokenUtil.checkIdentity(userOptional.get().getUsername(), token)) {
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			}else {
+				user.setUserId(userOptional.get().getUserId());
 			userRepo.save(user);
-			return ResponseEntity.ok().build();
+			return ResponseEntity.ok().build();}
 		}
-		
 		
 	
 		
-		@GetMapping("/user/{id}/privacy")
+		@GetMapping("/public/user/{id}/privacy")
+		@JsonView(View.Detailed.class)
 		public ResponseEntity<Boolean> getPrivacy(@PathVariable long id) {
 
 			Optional<User> userOptional = userRepo.findById(id);
@@ -79,9 +130,6 @@ public class UserController {
 			return new ResponseEntity<Boolean>(userOptional.get().isPrivacy(), HttpStatus.OK);
 			}else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		
-	
-		
 		
 		
 }

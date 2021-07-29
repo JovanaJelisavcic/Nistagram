@@ -3,6 +3,7 @@ package com.XMLiWS.microservices.userservice.bean;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,33 +11,53 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import com.XMLiWS.microservices.userservice.view.View;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 @JsonIgnoreProperties(value = { "following", "followers" })
 public class User {
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(unique=true,nullable=false,
+	        updatable=false)
+	@JsonView(View.Simple.class)
 	private Long userId;
+	@Column(unique=true, nullable=false,
+	        updatable=false)
+	@JsonView(View.Simple.class)
 	private String username;
+	@JsonView(View.Simple.class)
 	private String name;
+	@JsonView(View.Simple.class)
 	private String surname;
+	@JsonView(View.Detailed.class)
 	private String email;
+	@JsonView(View.Detailed.class)
 	private String phoneNumber;
+	@JsonView(View.Detailed.class)
 	private boolean sex;
+	@JsonView(View.Detailed.class)
 	private Date birthday;
+	@JsonView(View.Detailed.class)
 	private String website;
+	@JsonView(View.Detailed.class)
 	private String bio;
+	@JsonView(View.Simple.class)
 	private boolean privacy;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@Transient
+	@JsonView(View.Detailed.class)
 	private String password;
 	@OneToMany(mappedBy="to")
+	@JsonView(View.Simple.class)
 	private List<Followers> followers;
 
 	@OneToMany(mappedBy="from")
+	@JsonView(View.Simple.class)
 	private List<Followers> following;
 
 	public User() {

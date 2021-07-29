@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService{
 	    }
 	    userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
 	    userRepo.save(userDto);
-	   return new User(userDto.getUsername(), passwordEncoder.encode(userDto.getPassword()),new ArrayList<>() );
+	   return new User(userDto.getUsername(), passwordEncoder.encode(userDto.getPassword()),new ArrayList<>());
 	}
 	
 	@Override
@@ -38,5 +38,6 @@ public class UserService implements UserDetailsService{
 		UserDTO user = userRepo.findByUsername(username);
 		return new User(user.getUsername(), user.getPassword(), new ArrayList<>());
 	}
+
 
 }

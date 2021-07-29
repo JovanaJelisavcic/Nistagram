@@ -59,10 +59,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.antMatchers("/authenticate")
 		.permitAll()
 		.antMatchers("/create").permitAll()
+		.antMatchers("/h2-console/**").permitAll()
 		.anyRequest()
 		.authenticated().and().
 		sessionManagement()
 		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.headers().frameOptions().disable();
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 }
