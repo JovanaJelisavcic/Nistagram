@@ -16,12 +16,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 	private AuthProxy authProxy;
 	@Override
 	   public boolean preHandle(
+			   
 	      HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		String permission = authProxy.user();
-		System.out.println("THE PERMISION WAS "+ permission);
-	      	if(permission.equals("user")) {
-	      return true;}
-	      	else { return false;}
-	   }
+		
+	        	String permission = authProxy.user(request.getHeader("Authorization"));
+	        	if(permission.equals("user")) {
+	        		return true;}
+	        	else { return false;}
+	        }
+	   
 	
 }

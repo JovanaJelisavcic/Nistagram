@@ -42,7 +42,7 @@ public class UserController {
 			return new ResponseEntity<User>(user, HttpStatus.OK);
 		}
 		
-		@PostMapping("/user")
+		@PostMapping("/public/user")
 		public ResponseEntity<Object> createUser(@RequestBody User user) {
 			
 			String token = authProxy.create(user);
