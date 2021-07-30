@@ -39,5 +39,19 @@ public class UserService implements UserDetailsService{
 		return new User(user.getUsername(), user.getPassword(), new ArrayList<>());
 	}
 
+	public boolean checkIfValidOldPassword(UserDetails user, String oldPassword) {
+		UserDTO old =userRepo.findByUsername(user.getUsername());
+		if(passwordEncoder.matches(oldPassword, old.getPassword())) return true;
+		else return false;
+		
+	}
+
+	public void changeUserPassword(UserDetails user, String password) {
+		UserDTO old =userRepo.findByUsername(user.getUsername());
+		old.setPassword(passwordEncoder.encode(password));
+		userRepo.save(old);
+		
+	}
+
 
 }

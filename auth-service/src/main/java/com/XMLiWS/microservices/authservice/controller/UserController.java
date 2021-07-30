@@ -1,9 +1,11 @@
 package com.XMLiWS.microservices.authservice.controller;
 
+import org.bouncycastle.openssl.PasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.XMLiWS.microservices.authservice.model.JWTRequest;
 import com.XMLiWS.microservices.authservice.model.JWTResponse;
+import com.XMLiWS.microservices.authservice.model.PasswordChangeDTO;
 import com.XMLiWS.microservices.authservice.model.UserDTO;
 import com.XMLiWS.microservices.authservice.service.UserService;
 import com.XMLiWS.microservices.authservice.util.JWTUtility;
@@ -56,6 +59,19 @@ public class UserController {
 			final String token = jwtUtility.generateToken(userDetails);
 			
 			return new JWTResponse(token);
+		}
+		
+		@PostMapping("/user/changePassword")
+		public String changeUserPassword( 
+		  @RequestBody PasswordChangeDTO pass ) throws PasswordException {
+		    UserDetails user = userService.loadUserByUsername(
+		      SecurityContextHolder.getContext().getAuthentication().getName());
+		    
+		    if (!userService.checkIfValidOldPassword(user, pass.getOldPassword())) {
+		        throw new PasswordException(pass.getOldPassword());
+		    }
+		    userService.changeUserPassword(user, pass.getPassword());
+		    return "ok";
 		}
 		
 }
