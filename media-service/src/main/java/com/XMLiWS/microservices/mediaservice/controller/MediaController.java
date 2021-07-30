@@ -25,7 +25,8 @@ public class MediaController {
 	    @Autowired
 	    private FileStorageService fileStorageService;
 	    
-	    @PostMapping("/uploadFile")
+	    @PostMapping(value = "/uploadFile", consumes = {
+	            MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
 	    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
 	        String fileName = fileStorageService.storeFile(file);
 
@@ -38,7 +39,8 @@ public class MediaController {
 	                file.getContentType(), file.getSize());
 	    }
 
-	    @PostMapping("/uploadMultipleFiles")
+	    @PostMapping(value = "/uploadMultipleFiles", consumes = {
+	            MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
 	    public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
 	        return Arrays.asList(files)
 	                .stream()
