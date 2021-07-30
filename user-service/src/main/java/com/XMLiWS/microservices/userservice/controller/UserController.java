@@ -39,7 +39,9 @@ public class UserController {
 		FollowRepository followRepo;
 		@Autowired
 		private AuthProxy authProxy;
-		private TokenUtil tokenUtil = new TokenUtil();
+		@Autowired
+		private TokenUtil tokenUtil;
+		
 		 ObjectMapper mapper = new ObjectMapper();
 		
 		@GetMapping("/public/user/{id}")
@@ -121,11 +123,11 @@ public class UserController {
 		
 	
 		
-		@GetMapping("/public/user/{id}/privacy")
+		@GetMapping("/public/user/{username}/privacy")
 		@JsonView(View.Detailed.class)
-		public ResponseEntity<Boolean> getPrivacy(@PathVariable long id) {
+		public ResponseEntity<Boolean> getPrivacy(@PathVariable String username) {
 
-			Optional<User> userOptional = userRepo.findById(id);
+			Optional<User> userOptional = userRepo.findByUsername(username);
 			if(userOptional.isPresent()) {
 			return new ResponseEntity<Boolean>(userOptional.get().isPrivacy(), HttpStatus.OK);
 			}else return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -35,26 +35,50 @@ public class FollowController {
 	UserRepository userRepo;
 	@Autowired
 	FollowRepository followRepo;
-	private TokenUtil tokenUtil = new TokenUtil();
+	@Autowired
+	private TokenUtil tokenUtil;
+	
 
-	@GetMapping("public/user/following/{id}")
+	@GetMapping("public/user/following/{username}")
 	@JsonView(View.Detailed.class)
-	public ResponseEntity<List<Long>> usersFollowingIds(@PathVariable long id) {
+	public ResponseEntity<List<String>> usersFollowingIds(@PathVariable String username) {
 
-		Optional<User> userOptional = userRepo.findById(id);
+		Optional<User> userOptional = userRepo.findByUsername(username);
 		if (userOptional.isPresent()) {
 			User user = userOptional.get();
 			List<Followers> following = user.getFollowing();
-			List<Long> ids = new ArrayList<Long>();
+			List<String> ids = new ArrayList<String>();
 			for (Followers pair : following) {
 				if (pair.isAccepted()) {
-					ids.add(pair.getTo().getUserId());
+					ids.add(pair.getTo().getUsername());
 				}
 			}
 			if (ids.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
-			return new ResponseEntity<List<Long>>(ids, HttpStatus.OK);
+			return new ResponseEntity<List<String>>(ids, HttpStatus.OK);
+		} else
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+	
+	@GetMapping("public/user/followers/{username}")
+	@JsonView(View.Detailed.class)
+	public ResponseEntity<List<String>> usersFollowers(@PathVariable String username) {
+
+		Optional<User> userOptional = userRepo.findByUsername(username);
+		if (userOptional.isPresent()) {
+			User user = userOptional.get();
+			List<Followers> following = user.getFollowers();
+			List<String> ids = new ArrayList<String>();
+			for (Followers pair : following) {
+				if (pair.isAccepted()) {
+					ids.add(pair.getFrom().getUsername());
+				}
+			}
+			if (ids.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			return new ResponseEntity<List<String>>(ids, HttpStatus.OK);
 		} else
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}

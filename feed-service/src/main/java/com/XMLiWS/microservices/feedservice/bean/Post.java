@@ -26,7 +26,7 @@ public class Post {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long postID;
-	private Long userID;
+	private String userID;
 	@Column(nullable = true)
 	private int numOfLikes;
 	@Column(nullable = true)
@@ -54,14 +54,14 @@ public class Post {
 				name="liked",
 				joinColumns=@JoinColumn(name="postid"))
 	@Column(name="liked")
-	private List<Long> liked;
+	private List<String> liked;
 
 	@ElementCollection
 	@CollectionTable(
 				name="disliked",
 				joinColumns=@JoinColumn(name="postid"))
 	@Column(name="disliked")
-	private List<Long> disliked;
+	private List<String> disliked;
 
 	
 	public Post() {
@@ -70,9 +70,9 @@ public class Post {
 	
 
 
-	public Post(Long userID, int numOfLikes, int numOfComments, LocalDateTime published, List<String> url, boolean seeable, String location, String description) {
+	public Post(String userID, int numOfLikes, int numOfComments, LocalDateTime published, List<String> url, boolean seeable, String location, String description) {
 		super();
-		this.userID = userID;
+		this.setUserID(userID);
 		this.numOfLikes = numOfLikes;
 		this.numOfComments = numOfComments;
 		this.published = published;
@@ -89,12 +89,7 @@ public class Post {
 	public void setPostID(Long postID) {
 		this.postID = postID;
 	}
-	public Long getUserID() {
-		return userID;
-	}
-	public void setUserID(Long userID) {
-		this.userID = userID;
-	}
+	
 	public int getNumOfLikes() {
 		return numOfLikes;
 	}
@@ -178,28 +173,28 @@ public class Post {
 		this.profiletags = profiletags;
 	}
 
-	public List<Long> getLiked() {
+	public List<String> getLiked() {
 		return liked;
 	}
 
 
 
 
-	public void setLiked(List<Long> liked) {
+	public void setLiked(List<String> liked) {
 		this.liked = liked;
 	}
 
 
 
 
-	public List<Long> getDisliked() {
+	public List<String> getDisliked() {
 		return disliked;
 	}
 
 
 
 
-	public void setDisliked(List<Long> disliked) {
+	public void setDisliked(List<String> disliked) {
 		this.disliked = disliked;
 	}
 
@@ -223,6 +218,20 @@ public class Post {
 	        }
 	        }
 		
+	}
+
+
+
+
+	public String getUserID() {
+		return userID;
+	}
+
+
+
+
+	public void setUserID(String userID) {
+		this.userID = userID;
 	}
 	
 

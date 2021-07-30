@@ -1,4 +1,4 @@
-package com.XMLiWS.microservices.userservice.util;
+package com.XMLiWS.microservices.feedservice.util;
 
 import java.util.Base64;
 
@@ -6,10 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class TokenUtil {
 	
 	Logger logger = LoggerFactory.getLogger(TokenUtil.class);
+
 	
 	public boolean checkIdentity(String username, String token) {
 			if(username.equalsIgnoreCase(extractIdentity(token))) {
@@ -18,6 +20,7 @@ public class TokenUtil {
 		return false;
 		
 	}
+	
 	public String extractIdentity(String token) {
 		String[] chunks = token.split("\\.");
 		Base64.Decoder decoder = Base64.getDecoder();

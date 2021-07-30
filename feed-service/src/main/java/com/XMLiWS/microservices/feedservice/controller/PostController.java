@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.XMLiWS.microservices.feedservice.bean.Feed;
 import com.XMLiWS.microservices.feedservice.bean.Post;
 import com.XMLiWS.microservices.feedservice.proxy.UserProxy;
 import com.XMLiWS.microservices.feedservice.repository.PostRepository;
+import com.XMLiWS.microservices.feedservice.util.TokenUtil;
 
 
 
@@ -34,9 +36,12 @@ public class PostController {
 	
 	@Autowired
 	private UserProxy proxy;
+	@Autowired
+	private TokenUtil tokenUtil;
 	
 	@PostMapping("/post/post")
-	public ResponseEntity<Object> postPost(@RequestBody Post post) {
+	public ResponseEntity<Object> postPost(@RequestHeader("Authorization")String token, @RequestBody Post post) {
+		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
 		if(post.getUrl().size()==1) {
 		post.setPostType("post");
 		}else {
@@ -47,11 +52,13 @@ public class PostController {
 		post.setPublished( LocalDateTime.now());
 		post.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
 		repository.save(post);
-		return ResponseEntity.created(null).build();
+		return ResponseEntity.created(null).build();}
+		else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 	
 	@PostMapping("/post/story")
-	public ResponseEntity<Object> postStory(@RequestBody Post post) {
+	public ResponseEntity<Object> postStory(@RequestHeader("Authorization")String token,@RequestBody Post post) {
+		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
 		if(post.getUrl().size()==1) {
 		post.setPostType("story");
 		post.setDescription("");
@@ -78,12 +85,14 @@ public class PostController {
 				repository.save(story);
 			}
 		}
-		return ResponseEntity.created(null).build();
+		return ResponseEntity.created(null).build();}
+		else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 	
-	@GetMapping("/post/selfProfile/{id}")
-	public ResponseEntity<Feed> profilePosts(@PathVariable long id) {
-		List<Post> postsAndStories = repository.findByuserID(id);
+	@GetMapping("/myProfile")
+	public ResponseEntity<Feed> profilePosts(@RequestHeader("Authorization")String token) {
+		String username = tokenUtil.extractIdentity(token);
+		List<Post> postsAndStories = repository.findByuserID(username);
 		 Map<Boolean, List<Post>> groups = 
 		 postsAndStories.stream().collect(Collectors.partitioningBy( s -> s.getPostType().equalsIgnoreCase("story")));
 
@@ -98,41 +107,108 @@ public class PostController {
 		return new ResponseEntity<Feed>(feed, HttpStatus.OK);
 	}
 	
-	@GetMapping("/post/userProfile/{id}/{myid}")
-	public ResponseEntity<Feed> usersPosts(@PathVariable long id, @PathVariable long myid) {
-		if(proxy.getPrivacy(id).getBody()) {
-			List<Long> ids = proxy.usersFollowingIds(id).getBody();
-			if(ids.contains(myid)) {
-				return profilePosts(id);
-			}
+	@GetMapping("/userProfile/{username}")
+	public ResponseEntity<Feed> usersPosts(@RequestHeader("Authorization")String token,@PathVariable String username) {
+		String meUser = tokenUtil.extractIdentity(token);
+		if(proxy.getPrivacy(username).getBody()) {
+			List<String> followings = proxy.usersFollowers(username).getBody();
+				if(followings.contains(meUser)) {
+					Feed feed= getPosts(username);
+					return new ResponseEntity<Feed>(feed, HttpStatus.OK);
+				}else return new ResponseEntity<Feed>(HttpStatus.UNAUTHORIZED);
 		}else {	
-			return profilePosts(id);
+			Feed feed = getPosts(username);
+			return new ResponseEntity<Feed>(feed, HttpStatus.OK);
 		}
-		return null;
+		
 
 	}
 	
-	
-	@GetMapping("/post/liked/{id}")
-	public ResponseEntity<List<Post>> getLiked(@PathVariable long id) {
-		List<Post> posts= new ArrayList<>();
-		posts =repository.findLikedPosts(id);
-		if(posts.isEmpty()) {
-			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
+	@GetMapping("/public/userProfile/{username}")
+	public ResponseEntity<Feed> usersPostsPublic(@PathVariable String username) {
+		if(!proxy.getPrivacy(username).getBody()) {
+			Feed feed = getPosts(username);
+			if(feed.getPosts().isEmpty() && feed.getStories().isEmpty()) return new ResponseEntity<Feed>(HttpStatus.NOT_FOUND);
+			else return new ResponseEntity<Feed>(feed, HttpStatus.OK);
+		}else {	
+			return new ResponseEntity<Feed>(HttpStatus.UNAUTHORIZED);
 		}
-		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
+		
+
+	}
+
+	
+	
+	
+	@GetMapping("/post/liked/{username}")
+	public ResponseEntity<List<Post>> getLiked(@RequestHeader("Authorization")String token,@PathVariable String username) {
+		String meUser = tokenUtil.extractIdentity(token);
+		List<Post> posts = new ArrayList<>();
+		if(username.equals(meUser)) {
+			posts = getLiked(username);
+		}else {
+			if(!proxy.getPrivacy(username).getBody()) {
+				posts = getLiked(username);
+			}else {
+				List<String> followings = proxy.usersFollowers(username).getBody();
+				if(followings.contains(meUser)) {
+					posts = getLiked(username);
+				}else return new ResponseEntity<List<Post>>(HttpStatus.UNAUTHORIZED);
+			}
+			
+		}
+		
+		if(posts.isEmpty()) return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
+		else return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 		
 	}
 	
-	@GetMapping("/post/disliked/{id}")
-	public ResponseEntity<List<Post>> getDisLiked(@PathVariable long id) {
-		List<Post> posts= new ArrayList<>();
-		posts =repository.findDislikedPosts(id);
-		if(posts.isEmpty()) {
-			return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
+	
+	@GetMapping("/post/disliked/{username}")
+	public ResponseEntity<List<Post>> getDisiked(@RequestHeader("Authorization")String token,@PathVariable String username) {
+		String meUser = tokenUtil.extractIdentity(token);
+		List<Post> posts = new ArrayList<>();
+		if(username.equals(meUser)) {
+			posts = getDisiked(username);
+		}else {
+			if(!proxy.getPrivacy(username).getBody()) {
+				posts = getDisiked(username);
+			}else {
+				List<String> followings = proxy.usersFollowers(username).getBody();
+				if(followings.contains(meUser)) {
+					posts = getDisiked(username);
+				}else return new ResponseEntity<List<Post>>(HttpStatus.UNAUTHORIZED);
+			}
+			
 		}
-		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
+		
+		if(posts.isEmpty()) return new ResponseEntity<List<Post>>(HttpStatus.NOT_FOUND);
+		else return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 		
 	}
+	
+	private List<Post> getLiked(String username) {
+		return repository.findLikedPosts(username);
+	}
+	
+	private List<Post> getDisiked(String username) {
+		return repository.findDislikedPosts(username);
+	}
+
+	
+	
+	private Feed getPosts(String username) {
+		List<Post> postsAndStories = repository.findByuserID(username);
+		 Map<Boolean, List<Post>> groups = 
+		 postsAndStories.stream().collect(Collectors.partitioningBy( s -> s.getPostType().equalsIgnoreCase("story")));
+
+		 List<Post> posts = groups.get(false);
+		 List<Post> stories = groups.get(true);
+		Feed feed =  new Feed();
+		feed.setPosts(posts);
+		feed.setStories(stories);
+		return feed;
+	}
+	
 	
 }
