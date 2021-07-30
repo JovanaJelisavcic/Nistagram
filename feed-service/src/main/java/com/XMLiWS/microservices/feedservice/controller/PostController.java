@@ -204,10 +204,21 @@ public class PostController {
 
 		 List<Post> posts = groups.get(false);
 		 List<Post> stories = groups.get(true);
+		 List<Post> nowStories = filterStories(stories); 
 		Feed feed =  new Feed();
 		feed.setPosts(posts);
-		feed.setStories(stories);
+		feed.setStories(nowStories);
 		return feed;
+	}
+
+	private List<Post> filterStories(List<Post> stories) {
+		List<Post> result = new ArrayList<>();
+		for(Post post : stories) {
+			if(LocalDateTime.now().minusHours(24).isBefore(post.getPublished())){
+				result.add(post);
+			}
+		}
+		return result;
 	}
 	
 	
