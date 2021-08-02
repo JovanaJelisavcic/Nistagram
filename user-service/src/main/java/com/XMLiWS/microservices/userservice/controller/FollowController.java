@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,6 +28,7 @@ import com.XMLiWS.microservices.userservice.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
+@RequestMapping("/follows")
 public class FollowController {
 
 	Logger logger = LoggerFactory.getLogger(FollowController.class);
@@ -39,7 +41,7 @@ public class FollowController {
 	private TokenUtil tokenUtil;
 	
 
-	@GetMapping("public/user/following/{username}")
+	@GetMapping("/public/following/{username}")
 	@JsonView(View.Detailed.class)
 	public ResponseEntity<List<String>> usersFollowingIds(@PathVariable String username) {
 
@@ -61,7 +63,7 @@ public class FollowController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
-	@GetMapping("public/user/followers/{username}")
+	@GetMapping("/public/followers/{username}")
 	@JsonView(View.Detailed.class)
 	public ResponseEntity<List<String>> usersFollowers(@PathVariable String username) {
 

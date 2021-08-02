@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UserProxy {
 
 	
-	@GetMapping("public/user/following/{username}")
+	@GetMapping("/follows/public/following/{username}")
 	public ResponseEntity<List<String>> usersFollowingIds(@PathVariable String username);
 
-	@GetMapping("/public/user/{username}/privacy")
+	@GetMapping("/users/public/{username}/privacy")
 	public ResponseEntity<Boolean> getPrivacy(@PathVariable String username);
 
-	@GetMapping("public/user/followers/{username}")
+	@GetMapping("/follows/public/followers/{username}")
 	public ResponseEntity<List<String>> usersFollowers(@PathVariable String username);
 	
 }

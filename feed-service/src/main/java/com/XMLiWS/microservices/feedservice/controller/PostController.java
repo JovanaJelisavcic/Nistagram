@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.XMLiWS.microservices.feedservice.bean.Feed;
@@ -27,6 +28,7 @@ import com.XMLiWS.microservices.feedservice.util.TokenUtil;
 
 
 @RestController
+@RequestMapping("/posts")
 public class PostController {
 	
 	Logger logger = LoggerFactory.getLogger(PostController.class);
@@ -39,7 +41,7 @@ public class PostController {
 	@Autowired
 	private TokenUtil tokenUtil;
 	
-	@PostMapping("/post/post")
+	@PostMapping("/post")
 	public ResponseEntity<Object> postPost(@RequestHeader("Authorization")String token, @RequestBody Post post) {
 		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
 		if(post.getUrl().size()==1) {
@@ -56,7 +58,7 @@ public class PostController {
 		else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 	
-	@PostMapping("/post/story")
+	@PostMapping("/story")
 	public ResponseEntity<Object> postStory(@RequestHeader("Authorization")String token,@RequestBody Post post) {
 		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
 		if(post.getUrl().size()==1) {
@@ -140,7 +142,7 @@ public class PostController {
 	
 	
 	
-	@GetMapping("/post/liked/{username}")
+	@GetMapping("/liked/{username}")
 	public ResponseEntity<List<Post>> getLiked(@RequestHeader("Authorization")String token,@PathVariable String username) {
 		String meUser = tokenUtil.extractIdentity(token);
 		List<Post> posts = new ArrayList<>();
@@ -164,7 +166,7 @@ public class PostController {
 	}
 	
 	
-	@GetMapping("/post/disliked/{username}")
+	@GetMapping("/disliked/{username}")
 	public ResponseEntity<List<Post>> getDisiked(@RequestHeader("Authorization")String token,@PathVariable String username) {
 		String meUser = tokenUtil.extractIdentity(token);
 		List<Post> posts = new ArrayList<>();

@@ -12,17 +12,17 @@ import com.XMLiWS.microservices.feedservice.bean.Post;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-		@Query(value="SELECT * from POST where published < ?1 AND seeable AND post_type!='story' ORDER BY published DESC LIMIT 10", nativeQuery=true)
+		@Query(value="SELECT * from POST where published <= ?1 AND seeable AND post_type!='story' ORDER BY published DESC LIMIT 10", nativeQuery=true)
         ArrayList<Post> findForUnregisteredPosts(LocalDateTime localDateTime);
 		  
-		@Query(value="SELECT * from POST where published < ?1 AND published > ?2 AND seeable AND post_type='story' ORDER BY published DESC LIMIT 5", nativeQuery=true)
+		@Query(value="SELECT * from POST where published <= ?1 AND published >= ?2 AND seeable AND post_type='story' ORDER BY published DESC LIMIT 5", nativeQuery=true)
 		ArrayList<Post> findForUnregisteredStories(LocalDateTime localDateTime, LocalDateTime localDateTime2);
 		
-		@Query(value="SELECT * from POST where userID IN (?1) AND published < ?2 AND published > ?3 AND post_type='story' ORDER BY published", nativeQuery=true)
+		@Query(value="SELECT * from POST where userID IN (?1) AND published <= ?2 AND published >= ?3 AND post_type='story' ORDER BY published", nativeQuery=true)
 		ArrayList<Post> findStoriesForRegistered(List<String> followings,
 				LocalDateTime now, LocalDateTime minusHours);
 		
-		@Query(value="SELECT * from POST where userID IN (?1) AND published < ?2 AND post_type!='story' ORDER BY published", nativeQuery=true)
+		@Query(value="SELECT * from POST where userID IN (?1) AND published <= ?2 AND post_type!='story' ORDER BY published", nativeQuery=true)
         ArrayList<Post> findPostsForRegistered(Collection<String> ids, LocalDateTime localDateTime);
         
 		

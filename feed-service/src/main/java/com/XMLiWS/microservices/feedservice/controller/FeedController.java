@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.XMLiWS.microservices.feedservice.bean.Feed;
@@ -20,6 +21,7 @@ import com.XMLiWS.microservices.feedservice.repository.PostRepository;
 import com.XMLiWS.microservices.feedservice.util.TokenUtil;
 
 @RestController
+@RequestMapping("/feed")
 public class FeedController {
 	
 	Logger logger = LoggerFactory.getLogger(FeedController.class);
@@ -32,11 +34,11 @@ public class FeedController {
 	@Autowired
 	private TokenUtil tokenUtil;
 	
-	@GetMapping("public/feed")
+	@GetMapping("/public/anonymous")
 	public ResponseEntity<Feed> getUnregisteredFeed() {
 		ArrayList<Post> posts = repository.findForUnregisteredPosts(LocalDateTime.now());
 		ArrayList<Post> stories = repository.findForUnregisteredStories(LocalDateTime.now(),LocalDateTime.now().minusHours(24));
-		logger.info(LocalDateTime.now()+ " " + LocalDateTime.now().minusHours(24) );
+		logger.info(posts.toString()+ " " + LocalDateTime.now().minusHours(24) );
 		if(posts.isEmpty() && stories.isEmpty() ) {
 			 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -46,7 +48,7 @@ public class FeedController {
 		return new ResponseEntity<Feed>(feed, HttpStatus.OK);
 	}
 	
-	@GetMapping("/feed")
+	@GetMapping("/registered")
 	public ResponseEntity<Feed> getRegisteredFeed(@RequestHeader("Authorization") String token) {
 		String username = tokenUtil.extractIdentity(token);
 		List<String> followings =  proxy.usersFollowingIds(username).getBody();

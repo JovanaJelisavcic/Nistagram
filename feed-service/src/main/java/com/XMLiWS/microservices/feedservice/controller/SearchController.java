@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.XMLiWS.microservices.feedservice.bean.Post;
@@ -20,6 +21,7 @@ import com.XMLiWS.microservices.feedservice.util.TokenUtil;
 
 
 @RestController
+@RequestMapping("/search")
 public class SearchController {
 	
 	Logger logger = LoggerFactory.getLogger(SearchController.class);
@@ -31,7 +33,7 @@ public class SearchController {
 	@Autowired
 	private UserProxy userProxy;
 	
-	@GetMapping("/post/searchLocation/{loc}")
+	@GetMapping("/searchLocation/{loc}")
 	public ResponseEntity<List<Post>> searchLocation(@RequestHeader("Authorization") String token,@PathVariable String loc) {
 		String username = tokenUtil.extractIdentity(token);
 		 StringBuilder sb = new StringBuilder(loc.concat("%"));
@@ -44,7 +46,7 @@ public class SearchController {
 		return new ResponseEntity<List<Post>>(filtered, HttpStatus.OK);
 	}
 	
-	@GetMapping("/public/post/searchLocation/{loc}")
+	@GetMapping("/public/searchLocation/{loc}")
 	public ResponseEntity<List<Post>> searchLocationPublic(@PathVariable String loc) {
 		 StringBuilder sb = new StringBuilder(loc.concat("%"));
 		 sb.insert(0,"%");
@@ -56,7 +58,7 @@ public class SearchController {
 		return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 	}
 	
-	@GetMapping("/post/searchHash/{hash}")
+	@GetMapping("/searchHash/{hash}")
 	public ResponseEntity<List<Post>> searchHash(@RequestHeader("Authorization") String token,@PathVariable String hash) {
 		String username = tokenUtil.extractIdentity(token);
 		List<Post> posts = repository.findAll();
@@ -70,7 +72,7 @@ public class SearchController {
 	
 	
 
-	@GetMapping("public/post/searchHash/{hash}")
+	@GetMapping("/public/searchHash/{hash}")
 	public ResponseEntity<List<Post>> searchHashPublic(@PathVariable String hash) {
 		List<Post> posts = repository.findAllBySeeable(true);
 		List<Post> filtered = filterHash(posts, hash);
@@ -80,7 +82,7 @@ public class SearchController {
 		return new ResponseEntity<List<Post>>(filtered, HttpStatus.OK);
 	}
 	
-	@GetMapping("/post/searchProfileHash/{hash}")
+	@GetMapping("/searchProfileHash/{hash}")
 	public ResponseEntity<List<Post>> searchProfileHash(@RequestHeader("Authorization") String token,@PathVariable String hash) {
 		String username = tokenUtil.extractIdentity(token);
 		List<Post> posts = repository.findAll();
@@ -93,7 +95,7 @@ public class SearchController {
 	}
 	
 	
-	@GetMapping("/public/post/searchProfileHash/{hash}")
+	@GetMapping("/public/searchProfileHash/{hash}")
 	public ResponseEntity<List<Post>> searchProfileHashPublic(@PathVariable String hash) {
 		List<Post> posts = repository.findAllBySeeable(true);
 		List<Post> filtered = filterProfHash(posts, hash);

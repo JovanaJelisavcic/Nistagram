@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.XMLiWS.microservices.userservice.bean.Followers;
@@ -28,7 +29,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
 		Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -44,7 +47,7 @@ public class UserController {
 		
 		 ObjectMapper mapper = new ObjectMapper();
 		
-		@GetMapping("/public/user/{id}")
+		@GetMapping("/public/{id}")
 		public ResponseEntity<String> publicGetUser(@PathVariable String id) throws JsonProcessingException {
 			User user = userRepo.findByUserId(Long.parseLong(id));
 			if(user == null) {
@@ -56,7 +59,7 @@ public class UserController {
 		}
 		
 
-		@GetMapping("/user/{id}")
+		@GetMapping("/{id}")
 		public ResponseEntity<String> getUser(@RequestHeader("Authorization") String token, @PathVariable String id) throws JsonProcessingException {
 			String username = tokenUtil.extractIdentity(token);
 			User user = userRepo.findByUserId(Long.parseLong(id));
@@ -75,7 +78,7 @@ public class UserController {
 				
 			}
 			
-		@GetMapping("/user/me")
+		@GetMapping("/me")
 		@JsonView(View.Detailed.class)
 		public User showMe(@RequestHeader("Authorization") String token){
 			String username = tokenUtil.extractIdentity(token);
@@ -84,7 +87,7 @@ public class UserController {
 		}
 		
 		
-		@PostMapping("/public/user")
+		@PostMapping("/public/create")
 		@JsonView(View.Detailed.class)
 		public ResponseEntity<Object> createUser(@RequestBody User user) {
 			if(user.getUserId()!=null) {
@@ -106,7 +109,7 @@ public class UserController {
 
 		}
 		
-		@PutMapping("/user")
+		@PutMapping("/update")
 		@JsonView(View.Detailed.class)
 		public ResponseEntity<Object> updateUser(@RequestHeader("Authorization") String token,@RequestBody User user) {
 			
@@ -123,7 +126,7 @@ public class UserController {
 		
 	
 		
-		@GetMapping("/public/user/{username}/privacy")
+		@GetMapping("/public/{username}/privacy")
 		@JsonView(View.Detailed.class)
 		public ResponseEntity<Boolean> getPrivacy(@PathVariable String username) {
 

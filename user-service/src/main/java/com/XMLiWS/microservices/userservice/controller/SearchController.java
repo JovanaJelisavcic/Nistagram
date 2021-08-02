@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.XMLiWS.microservices.userservice.bean.User;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 
 @RestController
+@RequestMapping("/search")
 public class SearchController {
 	
 	Logger logger = LoggerFactory.getLogger(SearchController.class);
@@ -27,7 +29,7 @@ public class SearchController {
 	@Autowired
 	private UserRepository repository;
 	
-	@GetMapping("/user/searchHash/{hash}")
+	@GetMapping("/searchHash/{hash}")
 	@JsonView(View.Simple.class)
 	public ResponseEntity<List<User>> searchHashAll(@PathVariable String hash) {
 		 StringBuilder sb = new StringBuilder(hash.concat("%"));
@@ -40,7 +42,7 @@ public class SearchController {
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
 	}
 	
-	@GetMapping("/public/user/searchHash/{hash}")
+	@GetMapping("/public/searchHash/{hash}")
 	@JsonView(View.Simple.class)
 	public ResponseEntity<List<User>> searchHashPublic(@PathVariable String hash) {
 		 StringBuilder sb = new StringBuilder(hash.concat("%"));
@@ -54,7 +56,7 @@ public class SearchController {
 	}
 	
 	
-	@GetMapping("/user/searchProfiles/{name}")
+	@GetMapping("/searchProfiles/{name}")
 	@JsonView(View.Simple.class)
 	public ResponseEntity<List<User>> searchProfiles(@PathVariable String name) {
 		List<User> users = null;
@@ -79,7 +81,7 @@ public class SearchController {
 	}
 	
 	
-	@GetMapping("/public/user/searchProfiles/{name}")
+	@GetMapping("/public/searchProfiles/{name}")
 	@JsonView(View.Simple.class)
 	public ResponseEntity<List<User>> searchProfilesPublic(@PathVariable String name) {
 		logger.info(name);
