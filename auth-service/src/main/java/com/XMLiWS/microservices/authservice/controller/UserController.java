@@ -34,6 +34,7 @@ public class UserController {
 		
 		@GetMapping("/")
 		public String user() {
+			logger.info("hit the check");
 			return "user";
 		}
 		
@@ -48,7 +49,7 @@ public class UserController {
 			final UserDetails userDetails = userService.loadUserByUsername(jwtRequest.getUsername());
 			
 			final String token = jwtUtility.generateToken(userDetails);
-			
+			logger.info(jwtRequest.getUsername()+ "hit the authentification");
 			return new JWTResponse(token);
 		}
 		

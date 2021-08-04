@@ -38,11 +38,13 @@ public class PostController {
 	
 	@Autowired
 	private UserProxy proxy;
+	
 	@Autowired
 	private TokenUtil tokenUtil;
 	
-	@PostMapping("/post")
+	@PostMapping(value = "/post")
 	public ResponseEntity<Object> postPost(@RequestHeader("Authorization")String token, @RequestBody Post post) {
+		
 		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
 		if(post.getUrl().size()==1) {
 		post.setPostType("post");
