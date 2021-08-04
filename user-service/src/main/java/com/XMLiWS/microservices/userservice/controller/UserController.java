@@ -90,6 +90,7 @@ public class UserController {
 		@PostMapping("/public/create")
 		@JsonView(View.Detailed.class)
 		public ResponseEntity<Object> createUser(@RequestBody User user) {
+			logger.info("hit the user"+ user.getUsername());
 			if(user.getUserId()!=null) {
 				if(userRepo.findByUserId(user.getUserId())!=null)
 					return ResponseEntity.status(HttpStatus.CONFLICT).build();

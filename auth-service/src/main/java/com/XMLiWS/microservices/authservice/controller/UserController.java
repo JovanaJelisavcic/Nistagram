@@ -1,6 +1,8 @@
 package com.XMLiWS.microservices.authservice.controller;
 
 import org.bouncycastle.openssl.PasswordException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,6 +23,7 @@ import com.XMLiWS.microservices.authservice.util.JWTUtility;
 
 @RestController
 public class UserController {
+	Logger logger = LoggerFactory.getLogger(UserController.class);
 
 		@Autowired
 		private JWTUtility jwtUtility;
@@ -51,9 +54,7 @@ public class UserController {
 		
 		@PostMapping("/create")
 		public JWTResponse create(@RequestBody UserDTO userDTO ) throws Exception {
-			
-			
-			
+
 			final UserDetails userDetails = userService.registerNewUserAccount(userDTO);
 			
 			final String token = jwtUtility.generateToken(userDetails);
