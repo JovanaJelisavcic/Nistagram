@@ -9,21 +9,32 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.XMLiWS.microservices.feedservice.bean.Feed;
 import com.XMLiWS.microservices.feedservice.bean.Post;
 import com.XMLiWS.microservices.feedservice.proxy.UserProxy;
 import com.XMLiWS.microservices.feedservice.repository.PostRepository;
 import com.XMLiWS.microservices.feedservice.util.TokenUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 
@@ -32,6 +43,8 @@ import com.XMLiWS.microservices.feedservice.util.TokenUtil;
 public class PostController {
 	
 	Logger logger = LoggerFactory.getLogger(PostController.class);
+	
+	String uploadFile = "http://localhost:8100/uploadFile";
 
 	@Autowired
 	private PostRepository repository;
@@ -42,27 +55,43 @@ public class PostController {
 	@Autowired
 	private TokenUtil tokenUtil;
 	
-	@PostMapping(value = "/post")
-	public ResponseEntity<Object> postPost(@RequestHeader("Authorization")String token, @RequestBody Post post) {
+	@PostMapping(value = "/post", consumes = {MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE })
+	public ResponseEntity<Object> postPost(@RequestHeader("Authorization") String token, @RequestPart("files") MultipartFile[] files, @RequestParam("data") String data)
+			throws JsonMappingException, JsonProcessingException {
+		
+		Post post = exctractPost(data);
+		List<Integer> resp;
+		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
+				if(post.getUrl().size()==1) {
+				post.setPostType("post");
+				}else {
+					post.setPostType("album");
+				}
+				resp=uploadFiles(token,files);
+				boolean  check = checkResponse(resp);
+				if(!resp.isEmpty() && resp!=null && check){
+				post.setNumOfComments(0);
+				post.setNumOfLikes(0);
+				post.setPublished( LocalDateTime.now());
+				post.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
+				repository.save(post);
+				return ResponseEntity.created(null).build();}
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+
+
+	@PostMapping(value = "/story", consumes = {MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE })
+	public ResponseEntity<Object> postStory(@RequestHeader("Authorization")String token, @RequestPart("files") MultipartFile[] files,@RequestParam("data") String data) throws JsonMappingException, JsonProcessingException {
+		Post post = exctractPost(data);
 		
 		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
-		if(post.getUrl().size()==1) {
-		post.setPostType("post");
-		}else {
-			post.setPostType("album");
-		}
-		post.setNumOfComments(0);
-		post.setNumOfLikes(0);
-		post.setPublished( LocalDateTime.now());
-		post.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
-		repository.save(post);
-		return ResponseEntity.created(null).build();}
-		else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-	}
-	
-	@PostMapping("/story")
-	public ResponseEntity<Object> postStory(@RequestHeader("Authorization")String token,@RequestBody Post post) {
-		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
+			List<Integer> resp=uploadFiles(token,files);
+			boolean  check = checkResponse(resp);
+			if(check) {
 		if(post.getUrl().size()==1) {
 		post.setPostType("story");
 		post.setDescription("");
@@ -90,6 +119,7 @@ public class PostController {
 			}
 		}
 		return ResponseEntity.created(null).build();}
+			else return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();}
 		else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 	
@@ -225,5 +255,50 @@ public class PostController {
 		return result;
 	}
 	
+	
+
+	
+	
+private boolean checkResponse(List<Integer> resp) {
+	for(Integer i : resp) {
+		logger.info(i.toString());
+		if(i.intValue()!=200) 
+			return false;
+	}
+	return true;
+}
+
+
+private int uploadFile(String token, MultipartFile file) {
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+	headers.add("Authorization", token);
+
+	MultiValueMap<String, Object> body
+	  = new LinkedMultiValueMap<>();
+	body.add("file", file.getResource());
+	
+	HttpEntity<MultiValueMap<String, Object>> requestEntity
+	 = new HttpEntity<>(body, headers);
+
+	RestTemplate restTemplate = new RestTemplate();
+	ResponseEntity<String> response = restTemplate
+	  .postForEntity(uploadFile, requestEntity, String.class);
+	return response.getStatusCodeValue();
+}
+
+private List<Integer> uploadFiles(String token, MultipartFile[] files) {
+	List<Integer> resps = new ArrayList<>();
+	for (MultipartFile file : files ) {
+		resps.add(uploadFile(token,file));
+	}
+	return resps;
+}
+
+private Post exctractPost(String data) throws JsonMappingException, JsonProcessingException {
+	logger.info(data);
+	 Post post = new ObjectMapper().readValue(data, Post.class);  
+	return post;
+}
 	
 }
