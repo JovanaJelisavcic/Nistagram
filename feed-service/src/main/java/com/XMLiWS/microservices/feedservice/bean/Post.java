@@ -25,6 +25,8 @@ public class Post {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(unique=true,nullable=false,
+    updatable=false)
 	private Long postID;
 	private String userID;
 	@Column(nullable = true)

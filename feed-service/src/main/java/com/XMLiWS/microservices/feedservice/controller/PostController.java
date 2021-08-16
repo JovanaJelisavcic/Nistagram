@@ -1,5 +1,7 @@
 package com.XMLiWS.microservices.feedservice.controller;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,7 @@ public class PostController {
 	Logger logger = LoggerFactory.getLogger(PostController.class);
 	
 	String uploadFile = "http://localhost:8100/uploadFile";
+	String displayFile = "http://localhost:8100/displayFile";
 
 	@Autowired
 	private PostRepository repository;
@@ -123,6 +126,21 @@ public class PostController {
 		else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 	
+	
+	@GetMapping("/{postId}")
+	public ResponseEntity<Post> getPost(@RequestHeader("Authorization")String token, @PathVariable("postId") Long postId) throws URISyntaxException, IOException {
+		if(checkAllowed(token, postId)) {
+			List<Post> post = repository.findBypostID(postId);
+			if(post.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Post>(post.get(0), HttpStatus.OK);
+			
+		}else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		
+	}
+	
+
+
+
 	@GetMapping("/myProfile")
 	public ResponseEntity<Feed> profilePosts(@RequestHeader("Authorization")String token) {
 		String username = tokenUtil.extractIdentity(token);
@@ -287,6 +305,16 @@ private int uploadFile(String token, MultipartFile file) {
 	return response.getStatusCodeValue();
 }
 
+/*
+private Resource displayFile(String filename, String token) throws URISyntaxException {
+	HttpHeaders headers = new HttpHeaders();
+	headers.add("Authorization", token);
+	RestTemplate restTemplate = new RestTemplate();
+	URI uri =new URI(displayFile+"/"+filename);
+	ResponseEntity<Resource> result = restTemplate.getForEntity(uri, Resource.class);
+	return result.getBody();
+}*/
+
 private List<Integer> uploadFiles(String token, MultipartFile[] files) {
 	List<Integer> resps = new ArrayList<>();
 	for (MultipartFile file : files ) {
@@ -299,6 +327,19 @@ private Post exctractPost(String data) throws JsonMappingException, JsonProcessi
 	logger.info(data);
 	 Post post = new ObjectMapper().readValue(data, Post.class);  
 	return post;
+}
+
+private boolean checkAllowed(String token, Long postId) {
+	List<Post> post = repository.findBypostID(postId);
+	if(post.get(0).getUserID().equals(tokenUtil.extractIdentity(token)))
+		return true;
+	else if(post.get(0).isSeeable())
+		return true;
+	else if(proxy.usersFollowers(post.get(0).getUserID()).getBody().contains(tokenUtil.extractIdentity(token)))
+		return true;
+	else return false;
+	
+	
 }
 	
 }
