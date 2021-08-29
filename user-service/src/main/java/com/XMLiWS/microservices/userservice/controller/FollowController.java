@@ -86,7 +86,7 @@ public class FollowController {
 	}
 
 	@PostMapping("/followPublic/{toId}")
-	@JsonView(View.Detailed.class)
+	@JsonView(View.Simple.class)
 	public ResponseEntity<Object> addFollowingPublic(@RequestHeader("Authorization") String token, @PathVariable long toId) {
 		String username = tokenUtil.extractIdentity(token);
 		Optional<User> fromUser = userRepo.findByUsername(username);
@@ -148,5 +148,21 @@ public class FollowController {
 		}
 			
 	}
+	
+	@GetMapping("/followRequests")
+	@JsonView(View.Detailed.class)
+	public ResponseEntity<?> followRequests(@RequestHeader("Authorization") String token) {
+		String username = tokenUtil.extractIdentity(token);
+		User user = userRepo.findByUsername(username).get();
+		List<Followers> followers = user.getFollowers();
+		followers.removeIf(f->f.isAccepted());
+		List<User> users = new ArrayList<>();
+		for(Followers f : followers) {
+			users.add(f.getFrom());
+		}
+		if(users.isEmpty())  return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(users, HttpStatus.OK);
+	}
+	
 
 }

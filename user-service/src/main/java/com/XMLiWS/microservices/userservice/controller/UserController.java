@@ -47,29 +47,29 @@ public class UserController {
 		
 		 ObjectMapper mapper = new ObjectMapper();
 		
-		@GetMapping("/public/{id}")
-		public ResponseEntity<String> publicGetUser(@PathVariable String id) throws JsonProcessingException {
-			User user = userRepo.findByUserId(Long.parseLong(id));
-			if(user == null) {
+		@GetMapping("/public/{username}")
+		public ResponseEntity<String> publicGetUser(@PathVariable String username) throws JsonProcessingException {
+			Optional<User> user = userRepo.findByUsername(username);
+			if(user.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}else if(user.isPrivacy()) {
-				return new ResponseEntity<String>(mapper.writerWithView(View.Simple.class).writeValueAsString(user),HttpStatus.OK);
+			}else if(user.get().isPrivacy()) {
+				return new ResponseEntity<String>(mapper.writerWithView(View.Simple.class).writeValueAsString(user.get()),HttpStatus.OK);
 			}else 
-			return new ResponseEntity<String>(mapper.writerWithView(View.Detailed.class).writeValueAsString(user), HttpStatus.OK);
+			return new ResponseEntity<String>(mapper.writerWithView(View.Detailed.class).writeValueAsString(user.get()), HttpStatus.OK);
 		}
 		
 
-		@GetMapping("/{id}")
-		public ResponseEntity<String> getUser(@RequestHeader("Authorization") String token, @PathVariable String id) throws JsonProcessingException {
+		@GetMapping("/{username}")
+		public ResponseEntity<String> getUser(@RequestHeader("Authorization") String token, @PathVariable String username1) throws JsonProcessingException {
 			String username = tokenUtil.extractIdentity(token);
-			User user = userRepo.findByUserId(Long.parseLong(id));
+			User user = userRepo.findByUsername(username1).get();
 			if(user == null) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}else if(!user.isPrivacy()) {
 				return new ResponseEntity<String>(mapper.writerWithView(View.Detailed.class).writeValueAsString(user), HttpStatus.OK);
 				
 			}else {
-				Followers follow = followRepo.findFollowings(userRepo.findByUsername(username).get().getUserId(), Long.parseLong(id));
+				Followers follow = followRepo.findFollowings(userRepo.findByUsername(username).get().getUserId(), userRepo.findByUsername(username1).get().getUserId());
 				if(follow!=null && follow.isAccepted()) {
 					return new ResponseEntity<String>(mapper.writerWithView(View.Detailed.class).writeValueAsString(user), HttpStatus.OK);
 				}else  return new ResponseEntity<String>(mapper.writerWithView(View.Simple.class).writeValueAsString(user), HttpStatus.OK);

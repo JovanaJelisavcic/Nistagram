@@ -36,32 +36,32 @@ insert into DISLIKED(postid, disliked) values (4260, 'aselly1');
 insert into DISLIKED(postid, disliked) values (2632, 'aselly1');
 
 
-insert into URL(postid, url) values (3784, 'adler.mp4');
-insert into URL(postid, url) values (841, 'bluebird.jpg');
-insert into URL(postid, url) values (7400, 'bullfinch.mp4');
-insert into URL(postid, url) values (9854, 'butterfly.jpg');
-insert into URL(postid, url) values (5820, 'colors.jpg');
-insert into URL(postid, url) values (778, 'crvendac.jpg');
-insert into URL(postid, url) values (3116, 'download.jpg');
-insert into URL(postid, url) values (2383, 'feed.jpg');
-insert into URL(postid, url) values (2721, 'flying.mp4');
-insert into URL(postid, url) values (2097, 'gimpel.mp4');
-insert into URL(postid, url) values (6204, 'magpie.mp4');
-insert into URL(postid, url) values (8548, 'meadow.mp4');
-insert into URL(postid, url) values (7492, 'owl.jpg');
-insert into URL(postid, url) values (6691, 'parrot.jpg');
-insert into URL(postid, url) values (1981, 'rainlake.mp4');
-insert into URL(postid, url) values (3784, 'redeyes.jpg');
-insert into URL(postid, url) values (8267, 'redol.jpg');
-insert into URL(postid, url) values (4260, 'redy.mp4');
-insert into URL(postid, url) values (6170, 'robin.jpg');
-insert into URL(postid, url) values (2632, 'sea.mp4');
-insert into URL(postid, url) values (2721, 'skyler.jpg');
-insert into URL(postid, url) values (9854, 'soko.mp4');
-insert into URL(postid, url) values (9854, 'titmouse.jpeg');
-insert into URL(postid, url) values (2541, 'angry.jpg');
-insert into URL(postid, url) values (2651, 'blackie.mp4');
-insert into URL(postid, url) values (6585, 'crna.jpg');
+insert into URL(postid, url, media_type) values (3784, 'adler.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (841, 'bluebird.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (7400, 'bullfinch.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (9854, 'butterfly.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (5820, 'colors.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (778, 'crvendac.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (3116, 'download.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (2383, 'feed.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (2721, 'flying.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (2097, 'gimpel.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (6204, 'magpie.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (8548, 'meadow.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (7492, 'owl.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (6691, 'parrot.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (1981, 'rainlake.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (3784, 'redeyes.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (8267, 'redol.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (4260, 'redy.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (6170, 'robin.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (2632, 'sea.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (2721, 'skyler.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (9854, 'soko.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (9854, 'titmouse.jpeg', 'IMAGE');
+insert into URL(postid, url, media_type) values (2541, 'angry.jpg', 'IMAGE');
+insert into URL(postid, url, media_type) values (2651, 'blackie.mp4', 'VIDEO');
+insert into URL(postid, url, media_type) values (6585, 'crna.jpg', 'IMAGE');
 
 
 

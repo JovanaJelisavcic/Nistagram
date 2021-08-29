@@ -33,7 +33,6 @@ public class FeedController {
 	private UserProxy proxy;
 	@Autowired
 	private TokenUtil tokenUtil;
-	
 	@GetMapping("/public/anonymous")
 	public ResponseEntity<Feed> getUnregisteredFeed() {
 		ArrayList<Post> posts = repository.findForUnregisteredPosts(LocalDateTime.now());

@@ -2,6 +2,7 @@ package com.XMLiWS.microservices.feedservice.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.XMLiWS.microservices.feedservice.bean.Feed;
+import com.XMLiWS.microservices.feedservice.bean.MediaTypeEnum;
 import com.XMLiWS.microservices.feedservice.bean.Post;
+import com.XMLiWS.microservices.feedservice.bean.PostDTO;
+import com.XMLiWS.microservices.feedservice.bean.URLBean;
 import com.XMLiWS.microservices.feedservice.proxy.UserProxy;
 import com.XMLiWS.microservices.feedservice.repository.PostRepository;
 import com.XMLiWS.microservices.feedservice.util.TokenUtil;
@@ -63,22 +67,37 @@ public class PostController {
 	public ResponseEntity<Object> postPost(@RequestHeader("Authorization") String token, @RequestPart("files") MultipartFile[] files, @RequestParam("data") String data)
 			throws JsonMappingException, JsonProcessingException {
 		
-		Post post = exctractPost(data);
+		PostDTO postDTO = exctractPost(data);
+		logger.info("preuzme u dto" +postDTO.getUserID());
+		Post np = new Post();
+		np.setDescription(postDTO.getDescription());
+		np.setLocation(postDTO.getLocation());
+		np.setUserID(postDTO.getUserID());
 		List<Integer> resp;
-		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
-				if(post.getUrl().size()==1) {
-				post.setPostType("post");
+		if(tokenUtil.checkIdentity(postDTO.getUserID(), token)) {
+				if(postDTO.getUrl().size()==1) {
+				np.setPostType("post");
 				}else {
-					post.setPostType("album");
+					np.setPostType("album");
 				}
 				resp=uploadFiles(token,files);
 				boolean  check = checkResponse(resp);
 				if(!resp.isEmpty() && resp!=null && check){
-				post.setNumOfComments(0);
-				post.setNumOfLikes(0);
-				post.setPublished( LocalDateTime.now());
-				post.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
-				repository.save(post);
+				np.setNumOfComments(0);
+				np.setNumOfLikes(0);
+				np.setPublished( LocalDateTime.now());
+				np.setSeeable(!proxy.getPrivacy(postDTO.getUserID()).getBody());
+				List<URLBean> urlBeans = new ArrayList<>();
+				for(String url : postDTO.getUrl() ) {
+					String mimeType = URLConnection.guessContentTypeFromName(url);
+					URLBean urlBean = new URLBean();
+					urlBean.setUrl(url);
+					if(mimeType.contains("image")) urlBean.setMediaType(MediaTypeEnum.IMAGE);
+					if(mimeType.contains("video")) urlBean.setMediaType(MediaTypeEnum.VIDEO);
+					urlBeans.add(urlBean);
+				}
+				np.setUrl(urlBeans);
+				repository.save(np);
 				return ResponseEntity.created(null).build();}
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
@@ -89,35 +108,53 @@ public class PostController {
 	@PostMapping(value = "/story", consumes = {MediaType.APPLICATION_JSON_VALUE,
             MediaType.MULTIPART_FORM_DATA_VALUE })
 	public ResponseEntity<Object> postStory(@RequestHeader("Authorization")String token, @RequestPart("files") MultipartFile[] files,@RequestParam("data") String data) throws JsonMappingException, JsonProcessingException {
-		Post post = exctractPost(data);
+		PostDTO postDTO = exctractPost(data);
 		
-		if(tokenUtil.checkIdentity(post.getUserID(), token)) {
+		if(tokenUtil.checkIdentity(postDTO.getUserID(), token)) {
 			List<Integer> resp=uploadFiles(token,files);
 			boolean  check = checkResponse(resp);
 			if(check) {
-		if(post.getUrl().size()==1) {
-		post.setPostType("story");
-		post.setDescription("");
-		post.setLocation("");
-		post.setNumOfComments(0);
-		post.setNumOfLikes(0);
-		post.setPublished( LocalDateTime.now());
-		post.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
-		repository.save(post);
+		if(postDTO.getUrl().size()==1) {
+			Post np = new Post();
+			np.setUserID(postDTO.getUserID());
+		np.setPostType("story");
+		np.setDescription("");
+		np.setLocation("");
+		np.setNumOfComments(0);
+		np.setNumOfLikes(0);
+		np.setPublished( LocalDateTime.now());
+		np.setSeeable(!proxy.getPrivacy(postDTO.getUserID()).getBody());
+		List<URLBean> urlBeans = new ArrayList<>();
+		for(String url : postDTO.getUrl() ) {
+			String mimeType = URLConnection.guessContentTypeFromName(url);
+			URLBean urlBean = new URLBean();
+			urlBean.setUrl(url);
+			if(mimeType.contains("image")) urlBean.setMediaType(MediaTypeEnum.IMAGE);
+			if(mimeType.contains("video")) urlBean.setMediaType(MediaTypeEnum.VIDEO);
+			urlBeans.add(urlBean);
+		}
+		np.setUrl(urlBeans);
+		repository.save(np);
 		} else {
-			for(String url : post.getUrl()) {
+			for(String url : postDTO.getUrl()) {
 				Post story = new Post();
-				post.setDescription("");
-				post.setLocation("");
-				story.setUserID(post.getUserID());
+				story.setUserID(postDTO.getUserID());
+				story.setDescription("");
+				story.setLocation("");
+				story.setUserID(postDTO.getUserID());
 				story.setPostType("story");
 				story.setNumOfComments(0);
 				story.setNumOfLikes(0);
 				story.setPublished( LocalDateTime.now());
-				story.setSeeable(!proxy.getPrivacy(post.getUserID()).getBody());
-				List<String> thisUrl = new ArrayList<>();
-				thisUrl.add(url);
-				story.setUrl(thisUrl);
+				story.setSeeable(!proxy.getPrivacy(postDTO.getUserID()).getBody());
+				List<URLBean> urlBeans = new ArrayList<>();
+					String mimeType = URLConnection.guessContentTypeFromName(url);
+					URLBean urlBean = new URLBean();
+					urlBean.setUrl(url);
+					if(mimeType.contains("image")) urlBean.setMediaType(MediaTypeEnum.IMAGE);
+					if(mimeType.contains("video")) urlBean.setMediaType(MediaTypeEnum.VIDEO);
+					urlBeans.add(urlBean);
+					story.setUrl(urlBeans);
 				repository.save(story);
 			}
 		}
@@ -323,9 +360,9 @@ private List<Integer> uploadFiles(String token, MultipartFile[] files) {
 	return resps;
 }
 
-private Post exctractPost(String data) throws JsonMappingException, JsonProcessingException {
+private PostDTO exctractPost(String data) throws JsonMappingException, JsonProcessingException {
 	logger.info(data);
-	 Post post = new ObjectMapper().readValue(data, Post.class);  
+	 PostDTO post = new ObjectMapper().readValue(data, PostDTO.class);  
 	return post;
 }
 

@@ -42,7 +42,7 @@ public class Post {
 				name="url",
 				joinColumns=@JoinColumn(name="postid"))
 	@Column(name="url")
-	private List<String> url;
+	private List<URLBean> url;
 	@Column(nullable = true)
 	private String description;
 	@JsonInclude()
@@ -72,7 +72,7 @@ public class Post {
 	
 
 
-	public Post(String userID, int numOfLikes, int numOfComments, LocalDateTime published, List<String> url, boolean seeable, String location, String description) {
+	public Post(String userID, int numOfLikes, int numOfComments, LocalDateTime published, List<URLBean> url, boolean seeable, String location, String description) {
 		super();
 		this.setUserID(userID);
 		this.numOfLikes = numOfLikes;
@@ -110,10 +110,10 @@ public class Post {
 	public void setPublished(LocalDateTime published) {
 		this.published = published;
 	}
-	public List<String> getUrl() {
+	public List<URLBean> getUrl() {
 		return url;
 	}
-	public void setUrl(List<String> url) {
+	public void setUrl(List<URLBean> url) {
 		this.url = url;
 	}
 

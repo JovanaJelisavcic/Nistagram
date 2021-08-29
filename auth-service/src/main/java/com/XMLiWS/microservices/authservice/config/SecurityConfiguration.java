@@ -1,5 +1,8 @@
 package com.XMLiWS.microservices.authservice.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +16,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.XMLiWS.microservices.authservice.filter.JwtFilter;
 import com.XMLiWS.microservices.authservice.service.UserService;
@@ -31,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-
+	
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
 	    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -54,7 +59,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable()
+		http.cors().configurationSource(httpServletRequest -> {
+			CorsConfiguration config = new CorsConfiguration();
+			config.applyPermitDefaultValues();
+			config.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8765","http://localhost:8100","http://localhost:8200", "http://localhost:8761","http://localhost:8000"));
+			config.setAllowedHeaders(List.of("*"));
+			config.setAllowedMethods(Arrays.asList("*"));
+		        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		        source.registerCorsConfiguration("/**", config);
+			return config;
+		}).and().csrf().disable()
 		.authorizeRequests()
 		.antMatchers("/authenticate")
 		.permitAll()
@@ -67,4 +81,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.headers().frameOptions().disable();
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 	}
+	
+
 }
