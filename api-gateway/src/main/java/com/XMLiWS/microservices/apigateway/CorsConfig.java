@@ -38,7 +38,10 @@ public class CorsConfig {
       if (CorsUtils.isCorsRequest(request)) {
         ServerHttpResponse response = ctx.getResponse();
         HttpHeaders headers = response.getHeaders();
-        headers.add("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+        if(!request.getPath().toString().contains("auth")) {
+        	headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+        }
+   
         headers.add("Access-Control-Allow-Methods", ALLOWED_METHODS);
         headers.add("Access-Control-Max-Age", MAX_AGE);
         headers.add("Access-Control-Allow-Headers",ALLOWED_HEADERS);
@@ -55,7 +58,7 @@ public class CorsConfig {
   CorsConfigurationSource corsConfigurationSource() {
       CorsConfiguration configuration = new CorsConfiguration();
       configuration.applyPermitDefaultValues();
-      configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081"));
+     // configuration.setAllowedOrigins(Arrays.asList("*"));
       configuration.setAllowedMethods(Arrays.asList("*"));
       configuration.setAllowedHeaders(List.of("*"));
       UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
