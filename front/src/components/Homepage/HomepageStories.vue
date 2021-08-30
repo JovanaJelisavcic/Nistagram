@@ -7,7 +7,7 @@
         v-for="(story, index) in stories"
         :key="index"
       >
-        <img :src="image_prefix + '/' + story.url" v-if="story && story.url" />
+        <img :src="image_prefix + '/' + story.url[0].url" v-if="story && story.url" />
         <span v-if="story.userID">{{ story.userID }}</span>
       </b-col>
     </template>

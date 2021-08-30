@@ -4,7 +4,7 @@
       <template v-if="post.postType === 'post'">
         <img
           
-          :src="image_prefix + '/' + post.url"
+          :src="image_prefix + '/' + post.url[0].url"
           style="width: 100%; height: auto;"
         />
      
