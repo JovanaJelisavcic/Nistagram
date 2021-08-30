@@ -1,7 +1,31 @@
 <template>
   <div class="w-100 h-100" style="position: relative;">
+     <template
+      v-if="
+        currentUrlObject
+      "
+    >
+      <img
+        v-if="currentUrlObject.mediaType == 'IMAGE'"
+        :src="image_prefix + '/' + currentUrlObject.url"
+        style="width: 100%; height: auto;"
+      />
+      <video
+        v-if="currentUrlObject.mediaType == 'VIDEO'"
+        controls
+        autoplay="false"
+        muted="true"
+      >
+        <source
+          :src="image_prefix + '/' + currentUrlObject.url"
+          type="video/mp4"
+        />
+        Your browser does not support the video tag.
+      </video>
+    </template>
     <img
-      :src="image_prefix + '/' + currentUrl"
+      v-else
+      src="../../assets/post.jpg"
       style="width: 100%; height: auto;"
     />
     <div
@@ -59,11 +83,10 @@ export default {
     },
   },
   computed: {
-    currentUrl() {
+    currentUrlObject() {
       if (this.imageUrlArray && this.imageUrlArray[this.currentImageIndex]) {
-        return this.imageUrlArray[this.currentImageIndex] &&
-          this.imageUrlArray[this.currentImageIndex].url
-          ? this.imageUrlArray[this.currentImageIndex].url
+        return this.imageUrlArray[this.currentImageIndex] 
+          ? this.imageUrlArray[this.currentImageIndex]
           : "../../assets/post.jpg";
       }
       return "../../assets/post.jpg";

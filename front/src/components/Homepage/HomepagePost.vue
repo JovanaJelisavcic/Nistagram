@@ -1,13 +1,18 @@
 <template>
-  <b-row class="p-3">
+    <b-row class="p-3">
     <b-col cols="6" v-if="post">
       <template v-if="post.postType === 'post'">
+        <template v-if="post.url && post.url[0] && post.url[0].url">
         <img
-          
+          v-if="post.url[0].mediaType == 'IMAGE'"
           :src="image_prefix + '/' + post.url[0].url"
           style="width: 100%; height: auto;"
         />
-     
+         <video v-if="post.url[0].mediaType == 'VIDEO'" controls autoplay=false muted=true >
+            <source :src="image_prefix + '/' + post.url[0].url" type="video/mp4">
+            Your browser does not support the video tag.
+        </video> 
+      </template>
       </template>
       <template v-if="post.postType === 'album'">
         <CarouselAlbum :imageUrlArray="post.url"></CarouselAlbum>

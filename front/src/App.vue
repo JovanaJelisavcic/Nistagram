@@ -36,4 +36,8 @@ export default {};
   margin: auto;
   background-color: white;
 }
+video {
+  width: 100%;
+  height: auto;
+}
 </style>
