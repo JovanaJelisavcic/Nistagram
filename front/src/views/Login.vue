@@ -61,6 +61,10 @@ export default {
       password: null,
     };
   },
+  mounted(){
+    this.$store.commit('login/clearToken')
+
+  },
   methods: {
     async tryLogin() {
       if (

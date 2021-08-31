@@ -95,7 +95,6 @@ export default {
   },
   methods: {
     goToProfile(profile) {
-      console.log(profile);
       this.$store.commit(
         "profile/setprofileId",
         profile && profile.userID ? profile.userID : null

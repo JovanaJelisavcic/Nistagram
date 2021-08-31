@@ -2,7 +2,7 @@
   <div class="w-100 h-100" style="position: relative;">
      <template
       v-if="
-        currentUrlObject
+        currentUrlObject && currentUrlObject.url && currentUrlObject.mediaType
       "
     >
       <img
@@ -85,7 +85,8 @@ export default {
   computed: {
     currentUrlObject() {
       if (this.imageUrlArray && this.imageUrlArray[this.currentImageIndex]) {
-        return this.imageUrlArray[this.currentImageIndex] 
+      return this.imageUrlArray[this.currentImageIndex] &&
+          this.imageUrlArray[this.currentImageIndex].url
           ? this.imageUrlArray[this.currentImageIndex]
           : "../../assets/post.jpg";
       }

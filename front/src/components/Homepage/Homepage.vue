@@ -39,7 +39,7 @@ export default {
     },
   },
   async mounted() {
-    if (this.$store.getters["login/isRegisteredUser"]) {
+    if (this.$store.getters["login/getisRegisteredUser"]) {
       const response = await fetchHomepageRegistered();
       this.HomepagePosts = response && response.posts ? response.posts : [];
       this.HomepageStories =

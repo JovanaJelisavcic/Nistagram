@@ -53,8 +53,7 @@ export default {
       ...mapMutations("search", { set: "setSearchString" }),
     },
     isRegistered() {
-      const usr = localStorage.getItem("username");
-      return usr ? true : false;
+      return this.$store.getters["login/getisRegisteredUser"] ? true : false;
     },
   },
 };

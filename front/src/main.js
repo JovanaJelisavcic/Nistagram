@@ -18,3 +18,11 @@ new Vue({
   store,
   render: (h) => h(App),
 }).$mount("#app");
+
+const token = localStorage.getItem("token");
+if (token) {
+  const usr = localStorage.getItem("username");
+  store.commit("login/setUsername", usr);
+  if (usr) store.commit("login/setisRegisteredUser", true);
+  store.commit("login/setToken", token);
+}

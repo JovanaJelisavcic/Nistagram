@@ -2,7 +2,13 @@
   <b-overlay :show="isLoading">
     <div class="p-3 w-100" style="min-height: 100vh;">
       <div class="w-100 d-inline-flex align-items-center justify-content-end">
-        <b-button v-b-popover.bottomright="popoverData">Pratioci</b-button>
+          <div class="mr-3">
+          <b-icon icon="person"></b-icon>
+          <span v-if="followers.length">{{ followers.length }}</span>
+        </div>
+        <b-button v-if="!isPrivateProfile" v-b-popover.bottomright="popoverData"
+          >Pratioci</b-button
+        >
         <b-button v-if="isMe" @click="showRequests = !showRequests"
           >Zahtevi</b-button
         >
@@ -26,6 +32,8 @@
       >
         <p class="h1 mb-2"><b-icon icon="person-circle"></b-icon></p>
         <div>{{ username }}</div>
+         </div>
+      <div v-if="!isSettingsMenu">
         <template v-if="profileInfo">
           <div v-if="profileInfo.username">{{ profileInfo.username }}</div>
           <div v-if="profileInfo.name && profileInfo.surname">
@@ -42,8 +50,7 @@
             <div v-if="profileInfo.bio">{{ profileInfo.bio }}</div>
           </template>
         </template>
-      </div>
-      <div v-if="!isSettingsMenu">
+  
         <b-row v-if="showRequests">
           Zahtevi
           <b-col cols="12"></b-col>
@@ -147,19 +154,18 @@ export default {
     try {
       if (this.isMe) {
         const response2 = await getProfileInfoMe();
-        console.log(response2);
         this.profileInfo = response2;
 
         const response = await getMyProfileContent();
         this.posts = response && response.posts ? response.posts : [];
         this.stories = response && response.stories ? response.stories : [];
       } else {
-        if (this.$store.getters["login/isRegisteredUser"]) {
-          const response1 = getProfileInfoUserRegistered(
+        if (this.$store.getters["login/getisRegisteredUser"]) {
+          const response1 = await getProfileInfoUserRegistered(
             this.selectedProfileId
           );
           this.profileInfo = response1;
-          if (response1 && response.privacy && response.privacy == false) {
+          if (response1 && response1.privacy == false) {
             const response = await getprofileContentRegistered(
               this.selectedProfileId
             );
@@ -167,9 +173,11 @@ export default {
             this.stories = response && response.stories ? response.stories : [];
           }
         } else {
-          const response1 = getProfileInfoUserPublic(this.selectedProfileId);
+          const response1 = await getProfileInfoUserPublic(
+            this.selectedProfileId
+          );
           this.profileInfo = response1;
-          if (response1 && response.privacy && response.privacy == false) {
+          if (response1 && response1.privacy == false) {
             const response = await getprofileContentPublic(
               this.selectedProfileId
             );

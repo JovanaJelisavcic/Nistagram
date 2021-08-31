@@ -85,16 +85,16 @@ public class FollowController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	@PostMapping("/followPublic/{toId}")
+	@PostMapping("/followPublic/{user}")
 	@JsonView(View.Simple.class)
-	public ResponseEntity<Object> addFollowingPublic(@RequestHeader("Authorization") String token, @PathVariable long toId) {
+	public ResponseEntity<Object> addFollowingPublic(@RequestHeader("Authorization") String token, @PathVariable String user) {
 		String username = tokenUtil.extractIdentity(token);
 		Optional<User> fromUser = userRepo.findByUsername(username);
-		Optional<User> toUser = userRepo.findById(toId);
+		Optional<User> toUser = userRepo.findByUsername(user);
 		if (!fromUser.isPresent() || !toUser.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		} else if (followRepo.findFollowings(fromUser.get().getUserId(), toId) == null && !toUser.get().isPrivacy()) {
-			Followers follow = new Followers(fromUser.get(), userRepo.findByUserId(toId));
+		} else if (followRepo.findFollowings(fromUser.get().getUserId(), toUser.get().getUserId()) == null && !toUser.get().isPrivacy()) {
+			Followers follow = new Followers(fromUser.get(), toUser.get());
 			follow.setAccepted(true);
 			followRepo.save(follow);
 
@@ -107,15 +107,15 @@ public class FollowController {
 
 	}
 
-	@PostMapping("/followRequest/{toId}")
+	@PostMapping("/followRequest/{user}")
 	@JsonView(View.Detailed.class)
-	public ResponseEntity<Object> addFollowingRequest(@RequestHeader("Authorization") String token, @PathVariable long toId) {
+	public ResponseEntity<Object> addFollowingRequest(@RequestHeader("Authorization") String token, @PathVariable String user) {
 		String username = tokenUtil.extractIdentity(token);
 		Optional<User> fromUser = userRepo.findByUsername(username);
-		Optional<User> toUser = userRepo.findById(toId);
+		Optional<User> toUser = userRepo.findByUsername(user);
 		if (!fromUser.isPresent() || !toUser.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}else if (followRepo.findFollowings(fromUser.get().getUserId(), toId) == null && toUser.get().isPrivacy() ) {
+		}else if (followRepo.findFollowings(fromUser.get().getUserId(),  toUser.get().getUserId()) == null && toUser.get().isPrivacy() ) {
 			Followers follow = new Followers(fromUser.get(), toUser.get());
 			follow.setAccepted(false);
 			followRepo.save(follow);
@@ -129,17 +129,17 @@ public class FollowController {
 
 	}
 
-	@PutMapping("/followAccept/{fromId}")
+	@PutMapping("/followAccept/{user}")
 	@JsonView(View.Detailed.class)
-	public ResponseEntity<Object> addFollowingAccept(@RequestHeader("Authorization") String token, @PathVariable long fromId) {
+	public ResponseEntity<Object> addFollowingAccept(@RequestHeader("Authorization") String token, @PathVariable String user) {
 		
 		String username = tokenUtil.extractIdentity(token);
 		Optional<User> toUser = userRepo.findByUsername(username);
-		Optional<User> fromUser = userRepo.findById(fromId);
+		Optional<User> fromUser = userRepo.findByUsername(user);
 		if (!fromUser.isPresent() || !toUser.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}else {		
-		Followers follow = followRepo.findFollowings(fromId, toUser.get().getUserId());
+		Followers follow = followRepo.findFollowings(toUser.get().getUserId(), toUser.get().getUserId());
 		if (follow!=null) {
 			follow.setAccepted(true);
 			followRepo.save(follow);

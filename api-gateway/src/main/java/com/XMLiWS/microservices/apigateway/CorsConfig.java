@@ -38,7 +38,7 @@ public class CorsConfig {
       if (CorsUtils.isCorsRequest(request)) {
         ServerHttpResponse response = ctx.getResponse();
         HttpHeaders headers = response.getHeaders();
-        if(!request.getPath().toString().contains("auth")) {
+        if(!request.getHeaders().containsKey("Access-Control-Allow-Origin")) {
         	headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
         }
    
@@ -58,7 +58,7 @@ public class CorsConfig {
   CorsConfigurationSource corsConfigurationSource() {
       CorsConfiguration configuration = new CorsConfiguration();
       configuration.applyPermitDefaultValues();
-     // configuration.setAllowedOrigins(Arrays.asList("*"));
+    //  configuration.setAllowedOrigins(Arrays.asList("*"));
       configuration.setAllowedMethods(Arrays.asList("*"));
       configuration.setAllowedHeaders(List.of("*"));
       UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

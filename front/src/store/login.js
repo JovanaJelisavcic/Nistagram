@@ -13,6 +13,9 @@ export default {
     isRegisteredUser: false,
   },
   mutations: {
+    setisRegisteredUser(state, value) {
+      state.isRegisteredUser = value;
+    },
     setUsername(state, value) {
       state.username = value;
     },
@@ -40,6 +43,9 @@ export default {
     },
     clearToken(state) {
       localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      state.isRegisteredUser = false;
+      state.username = null;
       state.token = null;
     },
     resetStatus(state) {
@@ -78,6 +84,9 @@ export default {
     },
   },
   getters: {
+    getisRegisteredUser(state) {
+      return state.isRegisteredUser;
+    },
     getEmail(state) {
       return state.email;
     },
