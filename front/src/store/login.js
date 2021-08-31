@@ -31,7 +31,7 @@ export default {
       state.token = token;
       localStorage.setItem("token", state.token);
       localStorage.setItem("username", state.username);
-      axios.defaults.headers.common["authorization"] = `Bearer ${state.token}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}`;
       state.isRegisteredUser = true;
     },
     fillState(state) {
@@ -55,7 +55,7 @@ export default {
   actions: {
     async login({ commit }, { email, password }) {
       if (axios.defaults) {
-        delete axios.defaults.headers.common["authorization"];
+        delete axios.defaults.headers.common["Authorization"];
       }
       try {
         const response = await login({

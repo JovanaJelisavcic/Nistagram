@@ -109,7 +109,7 @@ public class PostController {
             MediaType.MULTIPART_FORM_DATA_VALUE })
 	public ResponseEntity<Object> postStory(@RequestHeader("Authorization")String token, @RequestPart("files") MultipartFile[] files,@RequestParam("data") String data) throws JsonMappingException, JsonProcessingException {
 		PostDTO postDTO = exctractPost(data);
-		
+		logger.info("story postuje + " + postDTO.getUserID()+ " jos  + " + postDTO.getUrl()+ "files + " + files.length);
 		if(tokenUtil.checkIdentity(postDTO.getUserID(), token)) {
 			List<Integer> resp=uploadFiles(token,files);
 			boolean  check = checkResponse(resp);

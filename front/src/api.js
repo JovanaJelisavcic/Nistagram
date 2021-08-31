@@ -696,7 +696,7 @@ export const getprofileContentRegistered = async (username) => {
 if (!mock) {
   let { data } = await axios.get(`/feed/posts/userProfile/${username}`);
   return data;
-};
+}
 };
 export const getprofileContentPublic = async (username) => {
   let { data } = await axios.get(`/feed/posts/public/userProfile/${username}`);
@@ -800,7 +800,7 @@ export const getProfileInfoUserRegistered = async (username) => {
   if (!mock) {
     let { data } = await axios.get(`/user/users/public/${username}`);
     return data;
-  };
+  }
 };
 export const getProfileInfoUserPublic = async (username) => {
   let { data } = await axios.get(`/user/users/public/${username}`);

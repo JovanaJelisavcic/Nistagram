@@ -59,16 +59,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().configurationSource(httpServletRequest -> {
+		http/*.cors().configurationSource(httpServletRequest -> {
 			CorsConfiguration config = new CorsConfiguration();
 			config.applyPermitDefaultValues();
-			config.setAllowedOrigins(Arrays.asList("*"));
-			config.setAllowedHeaders(List.of("*"));
+		//	config.setAllowedOrigins(Arrays.asList("*"));
+		//	config.setAllowedHeaders(List.of("*"));
 			config.setAllowedMethods(Arrays.asList("*"));
 		        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		        source.registerCorsConfiguration("/**", config);
 			return config;
-		}).and().csrf().disable()
+		}).and()*/.csrf().disable()
 		.authorizeRequests()
 		.antMatchers("/authenticate")
 		.permitAll()

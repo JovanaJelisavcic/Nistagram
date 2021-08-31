@@ -41,6 +41,7 @@ export default {
     goToMyProfile() {
       this.$store.commit("profile/setIsMe", true);
       const usr = localStorage.getItem("username");
+      console.log(usr);
       this.$router.push(`/profile/${usr}`);
     },
   },

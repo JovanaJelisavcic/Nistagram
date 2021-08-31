@@ -1,6 +1,24 @@
 <template>
   <b-overlay :show="isLoading">
     <div class="p-3 w-100" style="min-height: 100vh;">
+       <b-button v-b-modal.createPostModal v-if="isMe">Napravi post</b-button>
+      <b-modal
+        id="createPostModal"
+        @ok.prevent="createPost"
+        @cancel="clearModals"
+      >
+        <b-input placeholder="Opis" v-model="description"></b-input>
+        <b-input placeholder="Lokacija" v-model="location"></b-input>
+        <b-form-file multiple v-model="postFiles"></b-form-file>
+      </b-modal>
+      <b-button v-b-modal.createStoryModal v-if="isMe">Napravi stori</b-button>
+      <b-modal
+        id="createStoryModal"
+        @ok.prevent="createStory"
+        @cancel="clearModals"
+      >
+        <b-form-file multiple v-model="storyFiles"></b-form-file>
+      </b-modal>
       <div class="w-100 d-inline-flex align-items-center justify-content-end">
           <div class="mr-3">
           <b-icon icon="person"></b-icon>
@@ -85,6 +103,7 @@
 <script>
 import SettingsForm from "./UserSettings/SettingsForm";
 import { mapGetters, mapMutations } from "vuex";
+import axios from "axios";
 import {
   getprofileContentRegistered,
   getprofileContentPublic,
@@ -108,6 +127,10 @@ export default {
       followers: [],
       showRequests: false,
       friendRequests: null,
+      postFiles: [],
+      location: null,
+      description: null,
+      storyFiles: [],
     };
   },
   computed: {
@@ -147,6 +170,66 @@ export default {
         !this.isMe
         ? true
         : false;
+    },
+  },
+   methods: {
+    clearModals() {
+      this.postFiles = [];
+      this.location = null;
+      this.description = null;
+      this.storyFiles = [];
+    },
+    async createPost() {
+      let data = {
+        userID: this.username,
+        url: this.postFiles.map((file) => file.name),
+        location: this.location,
+        description: this.description,
+      };
+      let formData = new FormData();
+      formData.append("file", this.postFiles ? this.postFiles : []);
+      formData.append("data", JSON.stringify(data));
+      try {
+        await axios({
+          method: "post",
+          url: "/feed/posts/post",
+          data: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const response = await getMyProfileContent();
+        this.posts = response && response.posts ? response.posts : [];
+        this.$bvModal.hide("createPostModal");
+        alert("Uspesno");
+      } catch {
+        alert("Doslo je do greske");
+      }
+    },
+    async createStory() {
+      let data = {
+        userID: this.username,
+        url: this.storyFiles.map((file) => file.name),
+      };
+      let formData = new FormData();
+      formData.append("file", this.storyFiles ? this.storyFiles : []);
+      formData.append("data", JSON.stringify(data));
+      try {
+        await axios({
+          method: "post",
+          url: "/feed/posts/story",
+          data: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const response = await getMyProfileContent();
+        this.posts = response && response.stories ? response.stories : [];
+        this.$bvModal.hide("createStoryModal");
+        alert("Uspesno");
+      } catch {
+        alert("Doslo je do greske");
+      }
     },
   },
   async created() {

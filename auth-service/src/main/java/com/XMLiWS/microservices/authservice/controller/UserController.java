@@ -40,6 +40,7 @@ public class UserController {
 		
 		@PostMapping("/authenticate")
 		public JWTResponse authenticate(@RequestBody JWTRequest jwtRequest ) throws Exception {
+
 			try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
 			} catch(BadCredentialsException e) {

@@ -1,12 +1,17 @@
 package com.XMLiWS.microservices.mediaservice.storage;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -16,6 +21,7 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 public class FileStorageService {
+	Logger logger = LoggerFactory.getLogger(FileStorageService.class);
 
     private final Path fileStorageLocation;
 
@@ -33,8 +39,9 @@ public class FileStorageService {
 
     public String storeFile(MultipartFile file) {
         // Normalize file name
+    	
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
+        logger.info("in store file + " + fileName);
         try {
             // Check if the file's name contains invalid characters
             if(fileName.contains("..")) {

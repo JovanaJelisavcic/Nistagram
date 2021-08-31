@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,11 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+
 import com.XMLiWS.microservices.mediaservice.storage.FileStorageService;
 import com.XMLiWS.microservices.mediaservice.storage.UploadFileResponse;
 
 @RestController
 public class MediaController {
+	Logger logger = LoggerFactory.getLogger(MediaController.class);
 	
 	    @Autowired
 	    private FileStorageService fileStorageService;
@@ -30,6 +34,7 @@ public class MediaController {
 	    @PostMapping(value = "/uploadFile", consumes = {MediaType.APPLICATION_JSON_VALUE,
 	            MediaType.MULTIPART_FORM_DATA_VALUE })
 	    public UploadFileResponse uploadFile(@RequestPart("file") MultipartFile file) {
+	    	logger.info("hits upload file + " + file.getName());
 	        String fileName = fileStorageService.storeFile(file);
 
 	        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()

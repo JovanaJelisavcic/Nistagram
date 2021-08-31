@@ -3,7 +3,6 @@ package com.XMLiWS.microservices.apigateway;
 
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,11 +39,15 @@ public class CorsConfig {
         HttpHeaders headers = response.getHeaders();
         if(!request.getHeaders().containsKey("Access-Control-Allow-Origin")) {
         	headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+        	
         }
-   
+        if(!request.getHeaders().containsKey("Access-Control-Allow-Headers")) {
+        	 headers.add("Access-Control-Allow-Headers",ALLOWED_HEADERS);
+        	
+        }
         headers.add("Access-Control-Allow-Methods", ALLOWED_METHODS);
         headers.add("Access-Control-Max-Age", MAX_AGE);
-        headers.add("Access-Control-Allow-Headers",ALLOWED_HEADERS);
+       
         if (request.getMethod() == HttpMethod.OPTIONS) {
           response.setStatusCode(HttpStatus.OK);
           return Mono.empty();
@@ -60,7 +63,7 @@ public class CorsConfig {
       configuration.applyPermitDefaultValues();
     //  configuration.setAllowedOrigins(Arrays.asList("*"));
       configuration.setAllowedMethods(Arrays.asList("*"));
-      configuration.setAllowedHeaders(List.of("*"));
+     // configuration.setAllowedHeaders(List.of("*"));
       UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
       source.registerCorsConfiguration("/**", configuration);
       return source;
