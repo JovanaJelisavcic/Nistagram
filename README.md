@@ -1,6 +1,6 @@
 # XML2021
 
-Instagram-like application for posting images and videos, done for course of Internet Software Architectures, 2020  
+Instagram-like application for posting images and videos, done for course of XML & Web Services, 2020  
 
 ## Description
 
